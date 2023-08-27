@@ -1,5 +1,6 @@
 import os
 import time
+import uuid
 from fastapi import FastAPI, Depends, HTTPException
 import ccxt.async_support as ccxt
 from config.binancefuture_kucoin_arb import LOG_DIR, TIMESTAMP, BINANCE_API_KEY, BINANCE_SECRET_KEY
@@ -8,14 +9,7 @@ from logger import setup_logger
 
 app = FastAPI()
 
-binance = ccxt.binance({
-    'apiKey': BINANCE_API_KEY,
-    'secret': BINANCE_SECRET_KEY,
-    'enableRateLimit': True,
-    'options': {
-        'defaultType': 'future',
-        }
-})
+
 
 logger = setup_logger(__name__, os.path.join(LOG_DIR, f"{TIMESTAMP}_{__name__}.log"))
 logger.info(f"init {__name__}")
