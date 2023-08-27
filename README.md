@@ -9,15 +9,14 @@ docker login --username yitech --password <please_see_credential>
 
 ## Build local image
 ```commandline
-docker build -t symarb:latest .
-docker tag symarb:latest yitech/symmetric_arbitrage:latest
+docker build -t symmetric_arbitrage:latest .
+docker tag symmetric_arbitrage:latest yitech/symmetric_arbitrage:latest
 docker push yitech/symmetric_arbitrage:latest
 ```
 ## Clean image
 ```commandline
-docker rmi yitech/symmetric_arbitrage:latest
+docker images | awk symmetric_arbitrage {print $3}' | xargs docker rmi -f```
 ```
-
 # Usage
 ``` bash
 cd deployment/<exchange>

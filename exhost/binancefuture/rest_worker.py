@@ -17,7 +17,7 @@ binance = ccxt.binance({
 })
 
 
-logger = setup_logger(__name__, os.path.join(LOG_DIR, f"{TIMESTAMP}_{__name__}.log"))
+logger = setup_logger(__name__, os.path.join(LOG_DIR, f"{TIMESTAMP}_{__file__}.log"))
 logger.info(f"init {__name__}")
 
 
