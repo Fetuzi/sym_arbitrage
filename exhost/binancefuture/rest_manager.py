@@ -14,7 +14,6 @@ logger = setup_logger(__name__, os.path.join(LOG_DIR, f"{TIMESTAMP}_{__name__}.l
 logger.info(f"init {__name__}")
 
 
-
 @app.on_event("startup")
 async def startup_event():
     global connection, channel
