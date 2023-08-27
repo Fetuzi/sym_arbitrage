@@ -1,6 +1,7 @@
 import os
 import json
 from fastapi import FastAPI
+import ccxt.async_support as ccxt
 from config.binancefuture_kucoin_arb import LOG_DIR, TIMESTAMP, BINANCE_API_KEY, BINANCE_SECRET_KEY
 from logger import setup_logger
 
