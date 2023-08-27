@@ -21,5 +21,5 @@ docker rmi yitech/symmetric_arbitrage:latest
 # Usage
 ``` bash
 cd deployment/<exchange>
-docker compose up
+docker compose up -d
 ```

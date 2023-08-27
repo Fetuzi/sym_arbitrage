@@ -15,5 +15,3 @@ RUN pip install --upgrade pip && \
 COPY . /app
 
 # Set the command to run your application using uvicorn
-# Replace `exhost.binancefuture.rest_manager:app` with your specific module path and FastAPI app instance
-ENTRYPOINT ["python"]
