@@ -30,11 +30,11 @@ async def test():
 
 @app.get("/create_order")
 async def create_order(
-        symbol: str = 'BTC/USDT',
-        type: str = 'limit',
-        side: str = 'buy',
-        amount: float = 0.01,
-        price: float = 30000.0,
+        symbol: str,
+        type: str,
+        side: str,
+        amount: float,
+        price: float,
         binance: ccxt.binance = Depends(get_binance_client)
 ):
     try:

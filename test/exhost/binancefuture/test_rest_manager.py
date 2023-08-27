@@ -21,11 +21,11 @@ class TestHostedFastAPI(unittest.IsolatedAsyncioTestCase):
 
     async def test_create_order(self):
         params = {
-            "symbol": "ETH/USDT",
+            "symbol": "LTC/USDT",
             "type": "limit",
-            "side": "sell",
-            "amount": 0.5,
-            "price": 2000.0
+            "side": "buy",
+            "amount": 1,
+            "price": 64.0
         }
         response = await self.client.get(f"{self.BASE_URL}/create_order", params=params)
         json_data = response.json()
@@ -36,7 +36,7 @@ class TestHostedFastAPI(unittest.IsolatedAsyncioTestCase):
         json_data = response.json()
         self.assertIn('id', json_data)
         self.assertIn('status', json_data)
-        self.assertEqual(json_data['symbol'], 'BTC/USDT')
+        self.assertEqual(json_data['symbol'], 'LTC/USDT:USDT')
 
 
 if __name__ == "__main__":
