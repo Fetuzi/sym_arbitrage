@@ -8,6 +8,11 @@ services:
       - "6379:6379"
     networks:
       - symnet
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   mongodb:
     image: mongo:latest
@@ -20,6 +25,11 @@ services:
       - mongodb-data:/data/db
     networks:
       - symnet
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.stats()", "--username=root", "--password=examplepassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -28,6 +38,11 @@ services:
       - "5672:5672"    # RabbitMQ default
     networks:
       - symnet
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   binance-app:
     image: yitech/symmetric_arbitrage:latest
@@ -45,8 +60,16 @@ services:
     ports:
       - "8000:8000"
     entrypoint:
-      - uvicorn
-    command: ["exhost.binancefuture.rest_manager:app", "--host", "0.0.0.0", "--port", "8000"]
+      - dockerize
+      - -wait
+      - tcp://mongodb:27017
+      - -wait
+      - tcp://redis:6379
+      - -wait
+      - tcp://rabbitmq:5672
+      - -timeout
+      - 60s
+    command: ["uvicorn", "exhost.binancefuture.rest_manager:app", "--host", "0.0.0.0", "--port", "8000"]
 
 
   binance-worker:
@@ -61,8 +84,16 @@ services:
     environment:
       - PYTHONPATH=/app
     entrypoint:
-      - /bin/bash
-    # command: ["exhost/binancefuture/rest_worker.py"]
+      - dockerize
+      - -wait
+      - tcp://mongodb:27017
+      - -wait
+      - tcp://redis:6379
+      - -wait
+      - tcp://rabbitmq:5672
+      - -timeout
+      - 60s
+    command: ["python", "exhost/binancefuture/rest_worker.py"]
     networks:
       - symnet
 

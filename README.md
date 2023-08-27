@@ -15,8 +15,9 @@ docker push yitech/symmetric_arbitrage:latest
 ```
 ## Clean image
 ```commandline
-docker images | awk symmetric_arbitrage {print $3}' | xargs docker rmi -f```
+docker images | awk '/symmetric_arbitrage/ {print $3}' | xargs docker rmi -f
 ```
+
 # Usage
 ``` bash
 cd deployment/<exchange>

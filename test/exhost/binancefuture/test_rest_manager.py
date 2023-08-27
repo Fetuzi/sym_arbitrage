@@ -29,7 +29,7 @@ class TestHostedFastAPI(unittest.IsolatedAsyncioTestCase):
         }
         res = await self.client.get(f"{self.BASE_URL}/create_order", params=params)
         self.logger.info("async call before using response")
-        self.logger.info(f"{res}")
+        self.logger.info(f"{res.json()}")
 
 
 if __name__ == "__main__":
