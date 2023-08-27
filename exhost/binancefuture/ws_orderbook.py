@@ -4,7 +4,7 @@ import websockets
 from logger import setup_logger
 from config.binancefuture_kucoin_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, BINANCE_RELAY_PORT
 
-NAME = os.path.basename(__file__)
+NAME = os.path.splitext(os.path.basename(__file__))[0]
 logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{RECORDING_COIN}.log"))
 logger.info(f"init {NAME}")
 
