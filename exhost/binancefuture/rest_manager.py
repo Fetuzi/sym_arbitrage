@@ -13,5 +13,5 @@ logger.info(f"init {__name__}")
 
 @app.get("/test")
 async def test():
-    logger.info("test is call!")
+    logger.info("test is called!")
     return {"Hello": "World"}
