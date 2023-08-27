@@ -12,7 +12,7 @@ class TestHostedFastAPI(unittest.IsolatedAsyncioTestCase):
     async def asyncTearDown(self):
         await self.client.aclose()
 
-    async def test_test(self):
+    async def test_ping(self):
         response = await self.client.get(f"{self.BASE_URL}/ping")
         self.assertEqual(response.status_code, 200)
         json_data = response.json()
