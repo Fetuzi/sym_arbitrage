@@ -7,3 +7,6 @@ venv/
 # Project
 config/
 log/
+
+# Pycharm
+.idea
