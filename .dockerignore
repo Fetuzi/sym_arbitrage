@@ -1,0 +1,12 @@
+# Python
+__pycache__
+
+# venv
+venv/
+
+# Project
+config/
+log/
+
+# Pycharm
+.idea
