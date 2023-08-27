@@ -10,7 +10,7 @@ from logger import setup_logger
 
 app = FastAPI()
 
-logger = setup_logger(__name__, os.path.join(LOG_DIR, f"{TIMESTAMP}_{__name__}.log"))
+logger = setup_logger(__name__, os.path.join(LOG_DIR, f"{TIMESTAMP}_{os.path.basename(__file__)}.log"))
 logger.info(f"init {__name__}")
 
 
