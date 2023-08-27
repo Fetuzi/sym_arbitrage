@@ -38,8 +38,9 @@ async def create_order(
         binance: ccxt.binance = Depends(get_binance_client)
 ):
     try:
+        logger.info(f'Send request: {symbol=}, {type=}, {side=}, {amount=}, {price=}')
         order = await binance.create_order(symbol, type, side, amount, price)
-        return order
+        logger.info(f'{order=}')
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
