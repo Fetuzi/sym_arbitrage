@@ -1,8 +1,7 @@
 import os
 import json
 from fastapi import FastAPI
-
-from config.binancefuture_kucoin_arb import LOG_DIR, TIMESTAMP
+from config.binancefuture_kucoin_arb import LOG_DIR, TIMESTAMP, BINANCE_API_KEY, BINANCE_SECRET_KEY
 from logger import setup_logger
 
 
@@ -15,3 +14,6 @@ logger.info(f"init {__name__}")
 async def test():
     logger.info("test is called!")
     return {"Hello": "World"}
+
+
+
