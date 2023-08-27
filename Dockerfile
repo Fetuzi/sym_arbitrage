@@ -16,7 +16,4 @@ COPY . /app
 
 # Set the command to run your application using uvicorn
 # Replace `exhost.binancefuture.rest_manager:app` with your specific module path and FastAPI app instance
-CMD ["uvicorn", "exhost.binancefuture.rest_manager:app", "--host", "0.0.0.0", "--port", "8000"]
-
-# Expose the port the app runs on
-EXPOSE 8000
+ENTRYPOINT ["python"]
