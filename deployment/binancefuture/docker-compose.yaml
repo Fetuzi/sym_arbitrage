@@ -71,7 +71,6 @@ services:
       - 60s
     command: ["uvicorn", "exhost.binancefuture.rest_manager:app", "--host", "0.0.0.0", "--port", "8000"]
 
-
   binance-worker:
     image: yitech/symmetric_arbitrage:latest
     depends_on:
@@ -94,6 +93,33 @@ services:
       - -timeout
       - 60s
     command: ["python", "exhost/binancefuture/rest_worker.py"]
+    networks:
+      - symnet
+
+  binance-ws:
+    image: yitech/symmetric_arbitrage:latest
+    depends_on:
+      - redis
+      - mongodb
+      - rabbitmq
+    volumes:
+      - /Users/yite/Projects/sym_arbitrage/log:/app/log
+      - /Users/yite/Projects/sym_arbitrage/config:/app/config
+    environment:
+      - PYTHONPATH=/app
+    ports:
+      - "8765:8765"
+    entrypoint:
+      - dockerize
+      - -wait
+      - tcp://mongodb:27017
+      - -wait
+      - tcp://redis:6379
+      - -wait
+      - tcp://rabbitmq:5672
+      - -timeout
+      - 60s
+    command: [ "python", "exhost/binancefuture/ws_orderbook.py" ]
     networks:
       - symnet
 

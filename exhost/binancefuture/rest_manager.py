@@ -9,9 +9,9 @@ from logger import setup_logger
 
 
 app = FastAPI()
-
-logger = setup_logger(__name__, os.path.join(LOG_DIR, f"{TIMESTAMP}_{os.path.basename(__file__)}.log"))
-logger.info(f"init {__name__}")
+NAME = os.path.basename(__file__)
+logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}.log"))
+logger.info(f"init {NAME}")
 
 
 @app.on_event("startup")
