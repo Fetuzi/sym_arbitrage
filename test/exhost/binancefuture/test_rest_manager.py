@@ -21,14 +21,15 @@ class TestHostedFastAPI(unittest.IsolatedAsyncioTestCase):
 
     async def test_create_order(self):
         params = {
-            "symbol": "LTC/USDT",
+            "symbol": "LTC/USDT:USDT",
             "type": "limit",
             "side": "buy",
             "amount": 1,
             "price": 64.0
         }
-        await self.client.get(f"{self.BASE_URL}/create_order", params=params)
+        res = await self.client.get(f"{self.BASE_URL}/create_order", params=params)
         self.logger.info("async call before using response")
+        self.logger.info(f"{res}")
 
 
 if __name__ == "__main__":

@@ -2,11 +2,10 @@ import os
 import ccxt
 import pika
 import json
-import time
 
 from logger import setup_logger
 from config.binancefuture_kucoin_arb import (LOG_DIR, TIMESTAMP, BINANCE_API_KEY, BINANCE_SECRET_KEY,
-                                             RABBIT_MQ_HOST, RABBIT_MQ_PORT, RABBIT_MQ_REST_NAME)
+                                             RABBIT_MQ_HOST, RABBIT_MQ_PORT, BINANCE_RABBIT_MQ)
 
 binance = ccxt.binance({
     'apiKey': BINANCE_API_KEY,
@@ -25,8 +24,12 @@ logger.info(f"init {__name__}")
 def callback(ch, method, properties, body):
     """Callback function to process the message from the queue."""
     data = json.loads(body)
-    logger.info(f" [x] Received {data['message']}")
-    time.sleep(1)
+    logger.info(f" [x] Received {data}")
+    if data["topic"] == "create":
+        order = binance.create_order(data["symbol"], data["type"], data["side"], data["amount"], data["price"])
+        logger.info(f"{order=}")
+    else:
+        logger.error("Undefined topic.")
     logger.info(" [x] Done")
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -35,11 +38,11 @@ def start_worker():
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBIT_MQ_HOST, port=RABBIT_MQ_PORT))
     channel = connection.channel()
 
-    channel.queue_declare(queue=RABBIT_MQ_REST_NAME, durable=True)
+    channel.queue_declare(queue=BINANCE_RABBIT_MQ, durable=True)
     channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(queue=RABBIT_MQ_REST_NAME, on_message_callback=callback)
+    channel.basic_consume(queue=BINANCE_RABBIT_MQ, on_message_callback=callback)
 
-    print(' [*] Waiting for messages. To exit press CTRL+C')
+    logger.info(' [*] Waiting for messages. To exit press CTRL+C')
     channel.start_consuming()
 
 

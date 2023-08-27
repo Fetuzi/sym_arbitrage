@@ -13,20 +13,7 @@ app = FastAPI()
 logger = setup_logger(__name__, os.path.join(LOG_DIR, f"{TIMESTAMP}_{__name__}.log"))
 logger.info(f"init {__name__}")
 
-# Establish a connection to RabbitMQ server
-connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBIT_MQ_HOST, port=RABBIT_MQ_PORT))
-channel = connection.channel()
 
-# Declare a queue named 'BINANCE_RABBIT_MQ'. The queue will be created if it doesn't exist.
-channel.queue_declare(queue=BINANCE_RABBIT_MQ, durable=True)
-
-# Convert the data to JSON format and send to the 'task_queue'
-channel.basic_publish(exchange='',
-                      routing_key=BINANCE_RABBIT_MQ,
-                          body=json.dumps(data),
-                          properties=pika.BasicProperties(
-                              delivery_mode=2,  # make message persistent
-                          ))
 
 @app.on_event("startup")
 async def startup_event():
@@ -54,10 +41,23 @@ async def create_order(
         amount: float,
         price: float
 ):
-    try:
-        logger.info(f'Send request: {symbol=}, {type=}, {side=}, {amount=}, {price=}')
-        
-
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    logger.info(f'Send request: {symbol=}, {type=}, {side=}, {amount=}, {price=}')
+    _id = uuid.uuid4().hex
+    data = {
+        "id": _id,
+        "topic": "create",
+        "symbol": symbol,
+        "type": type,
+        "side": side,
+        "amount": amount,
+        "price": price
+    }
+    channel.basic_publish(exchange='',
+                          routing_key=BINANCE_RABBIT_MQ,
+                          body=json.dumps(data).encode('utf-8'),
+                          properties=pika.BasicProperties(
+                              delivery_mode=2,  # make message persistent
+                          ))
+    logger.info(f"{_id}: created!")
+    return {_id: "Created"}
 
