@@ -2,21 +2,16 @@
 It describes the symmetric arbitrage usage and layout.
 
 # Container Orchestra
-## Build base environment
+## Build basic environment
+Host Redis
 ```commandline
-docker login --username yitech --password <please_see_credential>
+docker run --name coin-redis -p 6379:6379 -d redis
+```
+Host MongoDB
+```commandline
+docker run --name coin-mongo -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=nioc9876 -p 27017:27017 -d mongo
 ```
 
-## Build local image
-```commandline
-docker build -t symmetric_arbitrage:latest .
-docker tag symmetric_arbitrage:latest yitech/symmetric_arbitrage:latest
-docker push yitech/symmetric_arbitrage:latest
-```
-## Clean image
-```commandline
-docker images | awk '/symmetric_arbitrage/ {print $3}' | xargs docker rmi -f
-```
 
 # Usage
 ``` bash
