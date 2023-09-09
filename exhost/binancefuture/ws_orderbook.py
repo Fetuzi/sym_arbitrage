@@ -2,7 +2,7 @@ import os
 import asyncio
 import websockets
 from general.logger import setup_logger
-from config.binancefuture_kucoin_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, BINANCE_RELAY_PORT
+from config.binancefuture_kucoin_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, RELAY_PORT
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]
 logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{RECORDING_COIN}.log"))
@@ -37,7 +37,7 @@ async def relay_server(websocket, path):
 clients = set()  # Set to keep track of connected clients
 
 # Starting the relay server
-start_server = websockets.serve(relay_server, '0.0.0.0', BINANCE_RELAY_PORT)
+start_server = websockets.serve(relay_server, '0.0.0.0', RELAY_PORT)
 
 async def main():
     # Connect to source WebSocket
