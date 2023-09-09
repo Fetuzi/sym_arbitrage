@@ -1,0 +1,14 @@
+version: '3'
+services:
+  app1:
+    build: .
+    ports:
+      - "8001:80"
+    command: ["python", "app1.py"]
+
+  app2:
+    build: .
+    ports:
+      - "8002:80"
+    command: ["python", "app2.py"]
+
