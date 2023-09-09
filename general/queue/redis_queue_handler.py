@@ -1,10 +1,16 @@
 # RedisQueueHandler.py
+import os
 import json
 import redis
+from general.logger import setup_logger
 
 
+NAME = os.path.splitext(os.path.basename(__file__))[0]
+logger = setup_logger(NAME)
+logger.info(f"init {NAME}")
 class RedisQueueHandler:
     def __init__(self, host, port, queue_name):
+        logger.info(f"Redis {host=}, {port=}")
         self.redis_conn = redis.Redis(host=host, port=port, db=0)
         self.queue_name = queue_name
 

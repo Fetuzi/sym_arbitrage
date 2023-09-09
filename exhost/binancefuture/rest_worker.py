@@ -5,8 +5,8 @@ import json
 
 from general.logger import setup_logger
 from general.queue import RedisQueueHandler
-from config.binancefuture_kucoin_arb import (LOG_DIR, TIMESTAMP, BINANCE_API_KEY, BINANCE_SECRET_KEY,
-                                             REDIS_HOST, REDIS_PORT, REDIS_QUEUE)
+from config.binancefuture_okx_arb import (LOG_DIR, TIMESTAMP, BINANCE_API_KEY, BINANCE_SECRET_KEY,
+                                          REDIS_HOST, REDIS_PORT, REDIS_QUEUE)
 
 binance = ccxt.binance({
     'apiKey': BINANCE_API_KEY,

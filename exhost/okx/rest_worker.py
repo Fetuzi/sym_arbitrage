@@ -2,8 +2,8 @@ import os
 import ccxt
 from general.logger import setup_logger
 from general.queue import RedisQueueHandler
-from config.binancefuture_kucoin_arb import (LOG_DIR, TIMESTAMP, OKX_API_KEY, OKX_API_SECRET, OKX_PASSPHRASS,
-                                             REDIS_HOST, REDIS_PORT, REDIS_QUEUE)
+from config.binancefuture_okx_arb import (LOG_DIR, TIMESTAMP, OKX_API_KEY, OKX_API_SECRET, OKX_PASSPHRASS,
+                                          REDIS_HOST, REDIS_PORT, REDIS_QUEUE)
 
 okx = ccxt.okex5(
     {

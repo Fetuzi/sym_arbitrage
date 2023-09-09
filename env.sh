@@ -16,14 +16,14 @@ set_mac_env() {
 
 # Function to set environment variables for tokyo production
 set_tokyo_env() {
-  export PYTHONPATH="/home/ubuntu/sym_arbitrage"
+  export PYTHONPATH="/app"
   export DEPLOYMENT="TOKYO"
   echo "Tokyo environment variables set."
 }
 
 # Function to set environment variables for tokyo production
 set_hk_env() {
-  export PYTHONPATH="/home/ubuntu/sym_arbitrage"
+  export PYTHONPATH="/app"
   export DEPLOYMENT="HK"
   echo "HK environment variables set."
 }

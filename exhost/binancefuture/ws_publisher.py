@@ -4,7 +4,7 @@ import websockets
 import json
 import redis
 from general.logger import setup_logger
-from config.binancefuture_kucoin_arb import TIMESTAMP, LOG_DIR, REDIS_HOST, REDIS_PORT, REDIS_PUBSUB, BINANCE, TOKYO_WS
+from config.binancefuture_okx_arb import TIMESTAMP, LOG_DIR, REDIS_HOST, REDIS_PORT, REDIS_PUBSUB, BINANCE, TOKYO_WS
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]
 logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{REDIS_PUBSUB}.log"))
