@@ -1,7 +1,7 @@
 import logging
 import unittest
 import httpx
-from logger import setup_logger
+from general.logger import setup_logger
 
 class TestHostedFastAPI(unittest.IsolatedAsyncioTestCase):
     BASE_URL = 'http://127.0.0.1:8000'  # Replace with your hosted app URL

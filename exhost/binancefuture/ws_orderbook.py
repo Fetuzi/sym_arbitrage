@@ -1,7 +1,7 @@
 import os
 import asyncio
 import websockets
-from logger import setup_logger
+from general.logger import setup_logger
 from config.binancefuture_kucoin_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, BINANCE_RELAY_PORT
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]

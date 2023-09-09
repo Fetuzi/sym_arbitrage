@@ -2,7 +2,7 @@ import logging
 import unittest
 import websockets
 import asyncio
-from logger import setup_logger
+from general.logger import setup_logger
 
 
 class TestWebSocketRelay(unittest.IsolatedAsyncioTestCase):

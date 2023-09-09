@@ -3,9 +3,9 @@ import time
 import json
 import uuid
 import pika
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from config.binancefuture_kucoin_arb import LOG_DIR, TIMESTAMP, RABBIT_MQ_HOST, RABBIT_MQ_PORT, BINANCE_RABBIT_MQ
-from logger import setup_logger
+from general.logger import setup_logger
 
 
 app = FastAPI()

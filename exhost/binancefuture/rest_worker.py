@@ -3,7 +3,7 @@ import ccxt
 import pika
 import json
 
-from logger import setup_logger
+from general.logger import setup_logger
 from config.binancefuture_kucoin_arb import (LOG_DIR, TIMESTAMP, BINANCE_API_KEY, BINANCE_SECRET_KEY,
                                              RABBIT_MQ_HOST, RABBIT_MQ_PORT, BINANCE_RABBIT_MQ)
 
