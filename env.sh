@@ -1,6 +1,13 @@
 #!/bin/bash
 
 # Function to set environment variables for development
+set_local_env() {
+  export PYTHONPATH="/Users/yite/Projects/sym_arbitrage"
+  export DEPLOYMENT="LOCAL"
+  echo "Local environment variables set."
+}
+
+# Function to set environment variables for development
 set_mac_env() {
   export PYTHONPATH="/Users/yite/Projects/sym_arbitrage"
   export DEPLOYMENT="MAC"
@@ -28,6 +35,9 @@ if [ -z "$1" ]; then
 fi
 
 case $1 in
+  "local")
+    set_local_env
+    ;;
   "mac")
     set_mac_env
     ;;
@@ -38,7 +48,7 @@ case $1 in
     set_hk_env
     ;;
   *)
-    echo "Invalid environment specified. Use development/staging/production."
+    echo "Invalid environment specified. Use local/mac/tokyo/hk."
     exit 1
     ;;
 esac

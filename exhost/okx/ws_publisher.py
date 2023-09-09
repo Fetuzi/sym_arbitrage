@@ -15,10 +15,10 @@ async def subscribe_to_websocket(uri, redis_client):
     async with websockets.connect(uri) as websocket:
 
         async for message in websocket:
-            data = json.loads(message)
+            data = json.loads(message)['data'][0]
             logger.info(f"Received data: {data}")
             # Publish to Redis
-            redis_client.publish(REDIS_PUBSUB, json.dumps({'ex': OKX, 'b': data['b'][0], 'a': data['a'][0]}))
+            redis_client.publish(REDIS_PUBSUB, json.dumps({'ex': OKX, 'b': data['bids'][0][0], 'a': data['asks'][0][0]}))
 
 
 if __name__ == '__main__':
