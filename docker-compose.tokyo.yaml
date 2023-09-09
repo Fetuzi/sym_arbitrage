@@ -2,8 +2,6 @@ version: '3'
 services:
   coin-redis:
     image: redis
-    ports:
-      - "6379:6379"
     networks:
       - coin-network
 
@@ -36,6 +34,18 @@ services:
     ports:
       - "8765:8765"
     command: ["python", "exhost/binancefuture/ws_orderbook.py"]
+    volumes:
+      - log:/app/log
+      - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
+    networks:
+      - coin-network
+
+  ws_publisher_tokyo:
+    build: .
+    entrypoint: [ "/app/entrypoint.sh", "tokyo" ]
+    ports:
+      - "8765:8765"
+    command: [ "python", "exhost/binancefuture/ws_publisher.py" ]
     volumes:
       - log:/app/log
       - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
