@@ -1,19 +1,46 @@
 version: '3'
 services:
+  coin-redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - coin-network
+
   rest_manager:
     build: .
     ports:
-      - "8000:8000"
-    entrypoint: [ "/app/entrypoint.sh", "tokyo" ]
-    command: [ "uvicorn", "exhost.rest_manager:app",
-               "--host", "0.0.0.0", "--port", "8000"]
+      - "8080:8080"
+    entrypoint: ["/app/entrypoint.sh", "tokyo"]
+    command: ["uvicorn", "exhost.rest_manager:app",
+              "--host", "0.0.0.0", "--port", "8080"]
     volumes:
       - log:/app/log
       - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
     networks:
       - coin-network
 
+  rest_worker:
+    build: .
+    entrypoint: ["/app/entrypoint.sh", "tokyo"]
+    command: [ "python", "exhost/binancefuture/rest_worker.py"]
+    volumes:
+      - log:/app/log
+      - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
+    networks:
+      - coin-network
 
+  ws_orderbook:
+    build: .
+    entrypoint: ["/app/entrypoint.sh", "tokyo"]
+    ports:
+      - "8765:8765"
+    command: ["python", "exhost/binancefuture/ws_orderbook.py"]
+    volumes:
+      - log:/app/log
+      - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
+    networks:
+      - coin-network
 
 networks:
   coin-network:
