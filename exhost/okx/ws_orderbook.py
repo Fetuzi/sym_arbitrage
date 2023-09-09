@@ -1,5 +1,6 @@
 import os
 import asyncio
+from asyncio import Lock
 import websockets
 import json
 from general.logger import setup_logger
@@ -40,24 +41,32 @@ async def source_connection(source_uri, relay_to_clients):
             logger.info(f"{message=}")
             await relay_to_clients(message)
 
+
+
+clients = set()
+clients_lock = Lock()
 # Relaying messages to all connected clients
 async def relay_to_clients(message):
-    if clients:  # Guard against possible empty set
-        await asyncio.gather(*(client.send(message) for client in clients))
+    async with clients_lock:
+        if clients:
+            await asyncio.gather(*(client.send(message) for client in clients))
 
-# Handler for incoming clients to your relay server
 async def relay_server(websocket, path):
-    clients.add(websocket)
-    logger.info(f"New client connected. All clients: {clients}")  # Log client count after new connection
+    async with clients_lock:
+        clients.add(websocket)
+    logger.info(f"New client connected. All clients: {clients}")
 
     try:
-        async for message in websocket:  # Here, we're just waiting for messages, if any, from the connected client.
-            pass                         # For this relay, we don't expect to get any.
+        async for message in websocket:
+            pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
     finally:
-        clients.remove(websocket)
-        logger.info(f"Client disconnected. all clients: {clients}")
+        async with clients_lock:
+            clients.remove(websocket)
+        logger.info(f"Client disconnected. All clients: {clients}")
 
-clients = set()  # Set to keep track of connected clients
+
 
 # Starting the relay server
 start_server = websockets.serve(relay_server, '0.0.0.0', RELAY_PORT)
