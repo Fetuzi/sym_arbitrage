@@ -4,7 +4,7 @@ import json
 import uuid
 from fastapi import FastAPI
 import redis
-from config.binancefuture_kucoin_arb import LOG_DIR, TIMESTAMP, REDIS_HOST, REDIS_PORT, REDIS_QUEUE_NAME
+from config.binancefuture_kucoin_arb import LOG_DIR, TIMESTAMP, REDIS_HOST, REDIS_PORT, REDIS_QUEUE
 from general.logger import setup_logger
 
 app = FastAPI()
@@ -51,7 +51,7 @@ async def create_order(
         "price": price
     }
 
-    r.rpush(REDIS_QUEUE_NAME, json.dumps(data))
+    r.rpush(REDIS_QUEUE, json.dumps(data))
 
     logger.info(f"{_id}: created!")
     return {_id: "Created"}
