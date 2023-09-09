@@ -15,6 +15,7 @@ async def source_connection(source_uri, relay_to_clients):
     async with websockets.connect(source_uri) as websocket:
         while True:
             message = await websocket.recv()
+            logger.info(f"{message=}")
             await relay_to_clients(message)
 
 # Relaying messages to all connected clients

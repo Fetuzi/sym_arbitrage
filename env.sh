@@ -23,7 +23,7 @@ set_hk_env() {
 
 # Main script execution
 if [ -z "$1" ]; then
-  echo "Please provide an environment (development/staging/production)."
+  echo "Please provide an environment (mac/tokyo/hk)."
   exit 1
 fi
 

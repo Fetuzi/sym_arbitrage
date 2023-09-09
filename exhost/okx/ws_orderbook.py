@@ -11,6 +11,12 @@ logger.info(f"init {NAME}")
 
 source_uri = f'wss://ws.okx.com:8443/ws/v5/public'
 
+async def heartbeat(websocket, interval=30):
+    while True:
+        await asyncio.sleep(interval)
+        await websocket.ping()
+        logger.info("Sent a ping")
+
 # Connection to the source WebSocket server
 async def source_connection(source_uri, relay_to_clients):
     async with websockets.connect(source_uri) as websocket:
@@ -25,8 +31,14 @@ async def source_connection(source_uri, relay_to_clients):
         await websocket.send(json.dumps(data))
         response = await websocket.recv()
         logger.info(f"Received response: {response}")
+
+        # Start the heartbeat
+        asyncio.create_task(heartbeat(websocket))
+
+
         while True:
             message = await websocket.recv()
+            logger.info(f"{message=}")
             await relay_to_clients(message)
 
 # Relaying messages to all connected clients
