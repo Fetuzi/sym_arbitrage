@@ -11,7 +11,7 @@ RETRY_WAIT_TIME = 5  # Wait time between each retry in seconds
 TIMEOUT = 3  # 3 seconds timeout for receiving data
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]
-logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{REDIS_PUBSUB}.log"))
+logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{OKX}.log"))
 logger.info(f"init {NAME}")
 
 async def subscribe_to_websocket(uri, redis_client):
