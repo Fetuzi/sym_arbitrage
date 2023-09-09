@@ -1,14 +1,63 @@
 version: '3'
 services:
-  app1:
-    build: .
-    ports:
-      - "8001:80"
-    command: ["python", "app1.py"]
+  coin-redis:
+    image: redis
+    networks:
+      - coin-network
 
-  app2:
+  rest_manager:
     build: .
+    depends_on:
+      - coin-redis
     ports:
-      - "8002:80"
-    command: ["python", "app2.py"]
+      - "8080:8080"
+    entrypoint: ["/app/entrypoint.sh", "hk"]
+    command: ["uvicorn", "exhost.rest_manager:app",
+              "--host", "0.0.0.0", "--port", "8080"]
+    volumes:
+      - ./log:/app/log
+      - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
+    networks:
+      - coin-network
 
+  rest_worker:
+    build: .
+    depends_on:
+      - rest_manager
+    entrypoint: ["/app/entrypoint.sh", "hk"]
+    command: [ "python", "exhost/okx/rest_worker.py"]
+    volumes:
+      - ./log:/app/log
+      - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
+    networks:
+      - coin-network
+
+  ws_orderbook:
+    build: .
+    depends_on:
+      - coin-redis
+    entrypoint: ["/app/entrypoint.sh", "hk"]
+    ports:
+      - "8765:8765"
+    command: ["python", "exhost/okx/ws_orderbook.py"]
+    volumes:
+      - ./log:/app/log
+      - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
+    networks:
+      - coin-network
+
+  ws_publisher_tokyo:
+    build: .
+    depends_on:
+      - ws_orderbook
+    entrypoint: [ "/app/entrypoint.sh", "hk" ]
+    command: [ "python", "exhost/okx/ws_publisher.py" ]
+    volumes:
+      - ./log:/app/log
+      - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
+    networks:
+      - coin-network
+
+networks:
+  coin-network:
+    driver: bridge

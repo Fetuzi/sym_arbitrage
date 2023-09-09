@@ -61,7 +61,3 @@ services:
 networks:
   coin-network:
     driver: bridge
-
-volumes:
-  log:
-    driver: local
