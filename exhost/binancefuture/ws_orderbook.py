@@ -25,7 +25,7 @@ async def relay_to_clients(message):
 # Handler for incoming clients to your relay server
 async def relay_server(websocket, path):
     clients.add(websocket)
-    logger.info(f"New client connected. All lients: {clients}")  # Log client count after new connection
+    logger.info(f"New client connected. All clients: {clients}")  # Log client count after new connection
 
     try:
         async for message in websocket:  # Here, we're just waiting for messages, if any, from the connected client.
