@@ -15,8 +15,9 @@ source_uri = f'wss://fstream.binance.com/ws/{RECORDING_COIN.lower()}usdt@depth5@
 async def source_connection(source_uri, relay_to_clients):
     async with websockets.connect(source_uri) as websocket:
         while True:
+            logger.info("About to receive message from source WebSocket")
             message = await websocket.recv()
-            logger.info(f"{message=}")
+            logger.info(f"Received: {message=}")
             await relay_to_clients(message)
 
 
@@ -25,8 +26,10 @@ clients_lock = Lock()
 # Relaying messages to all connected clients
 async def relay_to_clients(message):
     async with clients_lock:
+        logger.info("Acquired lock, about to send message to clients")
         if clients:
             await asyncio.gather(*(client.send(message) for client in clients))
+        logger.info("Message relayed to clients")
 
 async def relay_server(websocket, path):
     async with clients_lock:
@@ -34,6 +37,7 @@ async def relay_server(websocket, path):
     logger.info(f"New client connected. All clients: {clients}")
 
     try:
+        logger.info("Listening for incoming messages from client")
         async for message in websocket:
             pass
     except Exception as e:
@@ -48,11 +52,13 @@ async def relay_server(websocket, path):
 start_server = websockets.serve(relay_server, '0.0.0.0', RELAY_PORT)
 
 async def main():
-    # Connect to source WebSocket
+    logger.info("About to connect to source WebSocket")
     asyncio.create_task(source_connection(source_uri, relay_to_clients))
+    logger.info("Source WebSocket connected")
 
-    # Start relay server
+    logger.info("About to start relay server")
     await start_server
+    logger.info("Relay server started")
 
 # Run the event loop
 asyncio.get_event_loop().run_until_complete(main())
