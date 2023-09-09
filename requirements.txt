@@ -5,3 +5,4 @@ httpx
 asynctest
 pika
 websockets
+redis

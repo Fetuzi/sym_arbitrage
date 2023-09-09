@@ -2,30 +2,29 @@ import os
 import time
 import json
 import uuid
-import pika
 from fastapi import FastAPI
-from config.binancefuture_kucoin_arb import LOG_DIR, TIMESTAMP, RABBIT_MQ_HOST, RABBIT_MQ_PORT, BINANCE_RABBIT_MQ
+import redis
+from config.binancefuture_kucoin_arb import LOG_DIR, TIMESTAMP, REDIS_HOST, REDIS_PORT, REDIS_QUEUE_NAME
 from general.logger import setup_logger
-
 
 app = FastAPI()
 NAME = os.path.splitext(os.path.basename(__file__))[0]
 logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}.log"))
 logger.info(f"init {NAME}")
 
+# Initialize Redis connection
+r = None
 
 @app.on_event("startup")
 async def startup_event():
-    global connection, channel
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBIT_MQ_HOST, port=RABBIT_MQ_PORT))
-    channel = connection.channel()
-    channel.queue_declare(queue=BINANCE_RABBIT_MQ, durable=True)
+    global r
+    r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    global connection
-    if connection:
-        connection.close()
+    global r
+    if r:
+        del r
 
 @app.get("/ping")
 async def test():
@@ -51,12 +50,8 @@ async def create_order(
         "amount": amount,
         "price": price
     }
-    channel.basic_publish(exchange='',
-                          routing_key=BINANCE_RABBIT_MQ,
-                          body=json.dumps(data).encode('utf-8'),
-                          properties=pika.BasicProperties(
-                              delivery_mode=2,  # make message persistent
-                          ))
+
+    r.rpush(REDIS_QUEUE_NAME, json.dumps(data))
+
     logger.info(f"{_id}: created!")
     return {_id: "Created"}
-
