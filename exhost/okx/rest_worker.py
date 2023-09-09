@@ -5,7 +5,7 @@ from general.queue import RedisQueueHandler
 from config.binancefuture_kucoin_arb import (LOG_DIR, TIMESTAMP, OKX_API_KEY, OKX_API_SECRET, OKX_PASSPHRASS,
                                              REDIS_HOST, REDIS_PORT, REDIS_QUEUE)
 
-okx = ccxt.okx(
+okx = ccxt.okex5(
     {
         'apiKey': OKX_API_KEY,
         'secret': OKX_API_SECRET,
