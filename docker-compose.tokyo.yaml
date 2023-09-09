@@ -58,6 +58,18 @@ services:
     networks:
       - coin-network
 
+  ws_publisher_hk:
+    build: .
+    depends_on:
+      - ws_orderbook
+    entrypoint: [ "/app/entrypoint.sh", "tokyo" ]
+    command: [ "python", "exhost/okx/ws_publisher.py" ]
+    volumes:
+      - ./log:/app/log
+      - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
+    networks:
+      - coin-network
+
 networks:
   coin-network:
     driver: bridge
