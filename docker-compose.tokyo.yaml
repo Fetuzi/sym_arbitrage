@@ -15,7 +15,7 @@ services:
     command: ["uvicorn", "exhost.rest_manager:app",
               "--host", "0.0.0.0", "--port", "8080"]
     volumes:
-      - log:/app/log
+      - ./log:/app/log
       - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
     networks:
       - coin-network
@@ -27,7 +27,7 @@ services:
     entrypoint: ["/app/entrypoint.sh", "tokyo"]
     command: [ "python", "exhost/binancefuture/rest_worker.py"]
     volumes:
-      - log:/app/log
+      - ./log:/app/log
       - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
     networks:
       - coin-network
@@ -41,7 +41,7 @@ services:
       - "8765:8765"
     command: ["python", "exhost/binancefuture/ws_orderbook.py"]
     volumes:
-      - log:/app/log
+      - ./log:/app/log
       - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
     networks:
       - coin-network
@@ -53,7 +53,7 @@ services:
     entrypoint: [ "/app/entrypoint.sh", "tokyo" ]
     command: [ "python", "exhost/binancefuture/ws_publisher.py" ]
     volumes:
-      - log:/app/log
+      - ./log:/app/log
       - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
     networks:
       - coin-network
