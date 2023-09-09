@@ -35,7 +35,6 @@ async def source_connection(source_uri, relay_to_clients):
         # Start the heartbeat
         asyncio.create_task(heartbeat(websocket))
 
-
         while True:
             message = await websocket.recv()
             logger.info(f"{message=}")
