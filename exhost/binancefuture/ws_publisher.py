@@ -4,7 +4,7 @@ import websockets
 import json
 import redis
 from general.logger import setup_logger
-from config.binancefuture_kucoin_arb import TIMESTAMP, LOG_DIR, REDIS_HOST, REDIS_PORT, REDIS_PUBSUB, TOKYO_WS
+from config.binancefuture_kucoin_arb import TIMESTAMP, LOG_DIR, REDIS_HOST, REDIS_PORT, REDIS_PUBSUB, BINANCE, TOKYO_WS
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]
 logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{REDIS_PUBSUB}.log"))
@@ -18,7 +18,7 @@ async def subscribe_to_websocket(uri, redis_client):
             data = json.loads(message)
             logger.info(f"Received data: {data}")
             # Publish to Redis
-            redis_client.publish(REDIS_PUBSUB, json.dumps({'b': data['b'][0], 'a': data['a'][0]}))
+            redis_client.publish(REDIS_PUBSUB, json.dumps({'ex': BINANCE, 'b': data['b'][0], 'a': data['a'][0]}))
 
 
 if __name__ == '__main__':

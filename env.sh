@@ -3,7 +3,7 @@
 # Function to set environment variables for development
 set_mac_env() {
   export PYTHONPATH="/Users/yite/Projects/sym_arbitrage"
-  export DEPLOYMENT="DEV"
+  export DEPLOYMENT="MAC"
   echo "Development environment variables set."
 }
 
