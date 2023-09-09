@@ -2,6 +2,7 @@
 import json
 import redis
 
+
 class RedisQueueHandler:
     def __init__(self, host, port, queue_name):
         self.redis_conn = redis.Redis(host=host, port=port, db=0)
