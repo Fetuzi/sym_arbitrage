@@ -7,6 +7,8 @@ services:
 
   rest_manager:
     build: .
+    depends_on:
+      - coin-redis
     ports:
       - "8080:8080"
     entrypoint: ["/app/entrypoint.sh", "tokyo"]
@@ -20,6 +22,8 @@ services:
 
   rest_worker:
     build: .
+    depends_on:
+      - rest_manager
     entrypoint: ["/app/entrypoint.sh", "tokyo"]
     command: [ "python", "exhost/binancefuture/rest_worker.py"]
     volumes:
@@ -30,6 +34,8 @@ services:
 
   ws_orderbook:
     build: .
+    depends_on:
+      - coin-redis
     entrypoint: ["/app/entrypoint.sh", "tokyo"]
     ports:
       - "8765:8765"
@@ -42,6 +48,8 @@ services:
 
   ws_publisher_tokyo:
     build: .
+    depends_on:
+      - ws_orderbook
     entrypoint: [ "/app/entrypoint.sh", "tokyo" ]
     command: [ "python", "exhost/binancefuture/ws_publisher.py" ]
     volumes:
