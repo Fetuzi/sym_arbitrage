@@ -18,6 +18,7 @@ async def subscribe_to_websocket(uri, redis_client):
     retries = 0
     while retries < MAX_RETRIES:
         try:
+            logger.info(f"Attempting to connect to WebSocket URL: {uri}")
             async with websockets.connect(uri) as websocket:
                 retries = 0  # Reset retries if successful connection
                 while True:

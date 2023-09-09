@@ -7,10 +7,9 @@ set_local_env() {
   echo "Local environment variables set."
 }
 
-# Function to set environment variables for development
-set_mac_env() {
-  export PYTHONPATH="/Users/yite/Projects/sym_arbitrage"
-  export DEPLOYMENT="MAC"
+set_dev_env() {
+  export PYTHONPATH="/app"
+  export DEPLOYMENT="DEV"
   echo "Development environment variables set."
 }
 
@@ -38,8 +37,8 @@ case $1 in
   "local")
     set_local_env
     ;;
-  "mac")
-    set_mac_env
+  "dev")
+    set_dev_env
     ;;
   "tokyo")
     set_tokyo_env
@@ -48,7 +47,7 @@ case $1 in
     set_hk_env
     ;;
   *)
-    echo "Invalid environment specified. Use local/mac/tokyo/hk."
+    echo "Invalid environment specified. Use local/dev/tokyo/hk."
     exit 1
     ;;
 esac
