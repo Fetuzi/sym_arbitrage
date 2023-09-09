@@ -1,23 +1,29 @@
+import os
 import asyncio
 import websockets
 import json
 import redis
+from general.logger import setup_logger
+from config.binancefuture_kucoin_arb import TIMESTAMP, LOG_DIR, REDIS_PUBSUB
+
+NAME = os.path.splitext(os.path.basename(__file__))[0]
+logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{REDIS_PUBSUB}.log"))
+logger.info(f"init {NAME}")
 
 
 async def subscribe_to_websocket(uri, redis_client):
     async with websockets.connect(uri) as websocket:
-        await websocket.send(json.dumps({
-            "type": "subscribe",
-            "channel": "your_channel_here"
-        }))
-        print("Subscribed to WebSocket channel")
+        # await websocket.send(json.dumps({
+        #     "type": "subscribe",
+        #     "channel": "your_channel_here"
+        # }))
+        # print("Subscribed to WebSocket channel")
 
         async for message in websocket:
             data = json.loads(message)
-            print(f"Received data: {data}")
-
+            logger.info(f"Received data: {data}")
             # Publish to Redis
-            redis_client.publish("your_redis_channel", json.dumps(data))
+            redis_client.publish(REDIS_PUBSUB, json.dumps({'b': data['b'][0], 'a': data['a'][0]}))
 
 
 if __name__ == '__main__':
