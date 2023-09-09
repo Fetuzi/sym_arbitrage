@@ -43,8 +43,6 @@ services:
   ws_publisher_tokyo:
     build: .
     entrypoint: [ "/app/entrypoint.sh", "tokyo" ]
-    ports:
-      - "8765:8765"
     command: [ "python", "exhost/binancefuture/ws_publisher.py" ]
     volumes:
       - log:/app/log
