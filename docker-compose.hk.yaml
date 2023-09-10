@@ -70,6 +70,19 @@ services:
     networks:
       - coin-network
 
+  arbitraguer:
+    build: .
+    depends_on:
+      - ws_publisher_hk
+      - ws_publisher_tokyo
+    entrypoint: [ "/app/entrypoint.sh", "hk" ]
+    command: [ "python", "arbitrage/arbitrage_okx.py" ]
+    volumes:
+      - ./log:/app/log
+      - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
+    networks:
+      - coin-network
+
 networks:
   coin-network:
     driver: bridge
