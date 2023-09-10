@@ -48,28 +48,28 @@ mkdir -p log/hk_log
 case "$1" in
   pull)
     # Run git pull on tokyo008-free
-    run_git_pull "tokyo008-free" "sym_arbitrage"
+    run_git_pull "tokyo008-free" "sym_arbitrage" &
 
     # Run git pull on hk008-free
     run_git_pull "hk008-free" "sym_arbitrage"
     ;;
   up)
     # Run docker-compose up on tokyo008-free
-    run_docker_command "tokyo008-free" "sym_arbitrage" "docker-compose.tokyo.yaml" "up -d"
+    run_docker_command "tokyo008-free" "sym_arbitrage" "docker-compose.tokyo.yaml" "up -d" &
 
     # Run docker-compose up on hk008-free
     run_docker_command "hk008-free" "sym_arbitrage" "docker-compose.hk.yaml" "up -d"
     ;;
   down)
     # Run docker-compose down on tokyo008-free
-    run_docker_command "tokyo008-free" "sym_arbitrage" "docker-compose.tokyo.yaml" "down"
+    run_docker_command "tokyo008-free" "sym_arbitrage" "docker-compose.tokyo.yaml" "down" &
 
     # Run docker-compose down on hk008-free
     run_docker_command "hk008-free" "sym_arbitrage" "docker-compose.hk.yaml" "down"
     ;;
   build)
     # Run docker-compose build on tokyo008-free
-    run_docker_command "tokyo008-free" "sym_arbitrage" "docker-compose.tokyo.yaml" "build"
+    run_docker_command "tokyo008-free" "sym_arbitrage" "docker-compose.tokyo.yaml" "build" &
 
     # Run docker-compose build on hk008-free
     run_docker_command "hk008-free" "sym_arbitrage" "docker-compose.hk.yaml" "build"
@@ -82,15 +82,15 @@ case "$1" in
     run_docker_command "hk008-free" "sym_arbitrage" "docker-compose.hk.yaml" "ps"
     ;;
   log)
-    copy_logs "tokyo008-free" "~/sym_arbitrage/log" "log/tokyo_log"
+    copy_logs "tokyo008-free" "~/sym_arbitrage/log" "log/tokyo_log" &
     copy_logs "hk008-free" "~/sym_arbitrage/log" "log/hk_log"
     ;;
   clear)
-    clear_logs "tokyo008-free" "~/sym_arbitrage"
+    clear_logs "tokyo008-free" "~/sym_arbitrage" &
     clear_logs "hk008-free" "~/sym_arbitrage"
     ;;
   sync)
-    sync_file "./config/binancefuture_okx_arb.py" "tokyo008-free" "~/sym_arbitrage/config/binancefuture_okx_arb.py"
+    sync_file "./config/binancefuture_okx_arb.py" "tokyo008-free" "~/sym_arbitrage/config/binancefuture_okx_arb.py" &
     sync_file "./config/binancefuture_okx_arb.py" "hk008-free" "~/sym_arbitrage/config/binancefuture_okx_arb.py"
     ;;
   *)
