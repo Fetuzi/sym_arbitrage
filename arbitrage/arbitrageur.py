@@ -15,7 +15,7 @@ logger.info(f"init {NAME}")
 
 class SymmetricArbitrage:
     TRANS_STRATEGY = 1.001801531302 * 1.0002
-    CREATE_ORDER = f"{REST_MANAGER}:{REST_PORT}" + '/create_order'
+    CREATE_ORDER = f"{REST_MANAGER}/create_order"
 
     def __init__(self, ex, symbol, sides):
         # symmetric parameter (either A or B)

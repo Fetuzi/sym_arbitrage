@@ -1,10 +1,11 @@
 import logging
 import unittest
 import httpx
+from config.binancefuture_okx_arb import REST_MANAGER
 from general.logger import setup_logger
 
 class TestHostedFastAPI(unittest.IsolatedAsyncioTestCase):
-    BASE_URL = 'http://127.0.0.1:8000'  # Replace with your hosted app URL
+    BASE_URL = REST_MANAGER  # Replace with your hosted app URL
     logger = setup_logger(__name__, None, logging.INFO)
     async def asyncSetUp(self):
         self.client = httpx.AsyncClient()
@@ -25,11 +26,12 @@ class TestHostedFastAPI(unittest.IsolatedAsyncioTestCase):
             "type": "limit",
             "side": "buy",
             "amount": 1,
-            "price": 64.0
+            "price": 64.0,
+            "dry_run": True
         }
         res = await self.client.get(f"{self.BASE_URL}/create_order", params=params)
         self.logger.info("async call before using response")
-        self.logger.info(f"{res.json()}")
+        self.logger.info(f"{res=}")
 
 
 if __name__ == "__main__":
