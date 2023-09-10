@@ -21,7 +21,7 @@ copy_logs() {
   local server=$1
   local remote_dir=$2
   local local_dir=$3
-  scp "$server:$remote_dir/*" "$local_dir"
+  rsync -av --append "$server:$remote_dir/*" "$local_dir"
 }
 
 # Function to clear logs on a server
