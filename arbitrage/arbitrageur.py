@@ -21,7 +21,7 @@ class SymmetricArbitrage:
         # symmetric parameter (either A or B)
         self.ex = ex
         self.symbol = symbol
-        self.sides = sides
+        self.sides = sides  # [sell, buy] in BINANCE, [buy, sell] in OKX
 
         # status
         self.time = int(time.time() * 1000)
@@ -86,14 +86,15 @@ class SymmetricArbitrage:
     def _arb(self):
         time_gap = self.time - min(self.exchange_time[BINANCE], self.exchange_time[OKX]) < TIME_IN_ARB
         time_gap = time_gap and abs(self.exchange_time[BINANCE] - self.exchange_time[OKX]) < TIME_IN_EXCHANGE
-        dry_run = not self._risk()  # If pass risk check, not use dry_run
+        # dry_run = not self._risk()  # If pass risk check, not use dry_run
+        dry_run = True
         if time_gap and self.bid[BINANCE] > self.ask[OKX] * self.TRANS_STRATEGY:
             logger.info(f"arbitrage: {self.bid[BINANCE]=}, {self.ask[OKX]=}")
             side = self.sides[0]
             self._execute_order(side, dry_run)
         if time_gap and self.bid[OKX] > self.ask[BINANCE] * self.TRANS_STRATEGY:
-            logger.info(f"arbitrage: {self.bid[BINANCE]=}, {self.ask[OKX]=}")
-            side = self.sides[0]
+            logger.info(f"arbitrage: {self.bid[OKX]=}, {self.ask[BINANCE]=}")
+            side = self.sides[1]
             self._execute_order(side, dry_run)
 
     def _liq(self):
