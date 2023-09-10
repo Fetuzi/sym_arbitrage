@@ -6,7 +6,7 @@ import redis
 import requests
 
 from general.logger import setup_logger
-from config.binancefuture_okx_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, REDIS_HOST, REDIS_PORT, REDIS_PUBSUB, REST_MANAGER, BINANCE, BINANCE_LTC_USDT, OKX, TIME_IN_EXCHANGE, TIME_IN_ARB
+from config.binancefuture_okx_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, REDIS_HOST, REDIS_PORT, REDIS_PUBSUB, REST_MANAGER, BINANCE, OKX, TIME_IN_EXCHANGE, TIME_IN_ARB
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]
 logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{RECORDING_COIN}.log"))
@@ -17,7 +17,12 @@ class SymmetricArbitrage:
     TRANS_STRATEGY = 1.001801531302 * 1.0002
     CREATE_ORDER = REST_MANAGER + '/create_order'
 
-    def __init__(self):
+    def __init__(self, ex, symbol, sides):
+        # symmetric parameter (either A or B)
+        self.ex = ex
+        self.symbol = symbol
+        self.sides = sides
+
         # status
         self.time = int(time.time() * 1000)
         self.contract = 0  # BINANCE contract
@@ -29,8 +34,20 @@ class SymmetricArbitrage:
         self.redis_conn = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
         self.redis_channel = REDIS_PUBSUB
 
+    def _execute_order(self, side, dry_run):
+        response = requests.get(self.CREATE_ORDER, params={
+            "symbol": self.symbol,
+            "type": "market",
+            "side": side,
+            "amount": 1.0,
+            "price": (self.ask[self.ex] + self.bid[self.ex]) / 2,  # Pseudo Price for market order
+            "dry_run": dry_run
+        })
+        logger.info(f"{response=}")
+        increment = 1 if side == 'buy' else -1
+        self.contract = self.contract if dry_run else self.contract + increment
 
-    def run(self):
+    def run(self, exchange, symbol):
         pubsub = None
         try:
             pubsub = self.redis_conn.pubsub()
@@ -71,53 +88,21 @@ class SymmetricArbitrage:
         dry_run = not self._risk()  # If pass risk check, not use dry_run
         if time_gap and self.bid[BINANCE] > self.ask[OKX] * self.TRANS_STRATEGY:
             logger.info(f"arbitrage: {self.bid[BINANCE]=}, {self.ask[OKX]=}")
-            response = requests.get(self.CREATE_ORDER, params={
-                "symbol": BINANCE_LTC_USDT,
-                "type": "market",
-                "side": "sell",
-                "amount": 1.0,
-                "price": self.bid[BINANCE],  # pseudo price for market order
-                "dry_run": dry_run
-            })
-            logger.info(f"{response=}")
-            self.contract = self.contract if dry_run else self.contract - 1
+            side = self.sides[0]
+            self._execute_order(side, dry_run)
         if time_gap and self.bid[OKX] > self.ask[BINANCE] * self.TRANS_STRATEGY:
-            response = requests.get(self.CREATE_ORDER, params={
-                "symbol": BINANCE_LTC_USDT,
-                "type": "market",
-                "side": "buy",
-                "amount": 1.0,
-                "price": self.ask[BINANCE],  # pseudo price for market order
-                "dry_run": dry_run
-            })
-            logger.info(f"{response=}")
-            self.contract = self.contract if dry_run else self.contract + 1
+            logger.info(f"arbitrage: {self.bid[BINANCE]=}, {self.ask[OKX]=}")
+            side = self.sides[0]
+            self._execute_order(side, dry_run)
 
     def _liq(self):
         if self.contract > 0 and self.bid[BINANCE] >= self.ask[OKX]:
-            logger.info(f"liquidate, sell 1 in binance")
-            response = requests.get(self.CREATE_ORDER, params={
-                "symbol": BINANCE_LTC_USDT,
-                "type": "market",
-                "side": "sell",
-                "amount": 1.0,
-                "price": self.ask[BINANCE],  # pseudo price for market order
-            })
-            logger.info(f"{response=}")
-            self.contract -= 1
+            side = self.sides[0]
+            logger.info(f"liquidate: {side} 1 contract")
+            self._execute_order(side, False)  # Price is arbitrary
         if self.contract < 0 and self.ask[BINANCE] <= self.bid[OKX]:
-            logger.info(f"liquidate, buy 1 in binance")
-            response = requests.get(self.CREATE_ORDER, params={
-                "symbol": BINANCE_LTC_USDT,
-                "type": "market",
-                "side": "buy",
-                "amount": 1.0,
-                "price": self.ask[BINANCE],  # pseudo price for market order
-            })
-            logger.info(f"{response=}")
-            self.contract += 1
+            side = self.sides[1]
+            logger.info(f"liquidate: {side} 1 in contract")
+            self._execute_order(side, False)  # Price is arbitrary
 
 
-if __name__ == '__main__':
-    sym = SymmetricArbitrage()
-    sym.run()

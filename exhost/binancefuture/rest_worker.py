@@ -1,7 +1,5 @@
 import os
 import ccxt
-import pika
-import json
 
 from general.logger import setup_logger
 from general.queue import RedisQueueHandler
