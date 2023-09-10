@@ -35,14 +35,16 @@ class SymmetricArbitrage:
         self.redis_channel = REDIS_PUBSUB
 
     def _execute_order(self, side, dry_run):
-        response = requests.get(self.CREATE_ORDER, params={
+        params = {
             "symbol": self.symbol,
             "type": "market",
             "side": side,
             "amount": 1.0,
             "price": (self.ask[self.ex] + self.bid[self.ex]) / 2,  # Pseudo Price for market order
             "dry_run": dry_run
-        })
+        }
+        logger.info(f"request {params=}")
+        response = requests.get(self.CREATE_ORDER, params=params)
         logger.info(f"{response=}")
         increment = 1 if side == 'buy' else -1
         self.contract = self.contract if dry_run else self.contract + increment
