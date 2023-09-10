@@ -6,7 +6,7 @@ import redis
 import requests
 
 from general.logger import setup_logger
-from config.binancefuture_okx_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, REDIS_HOST, REDIS_PORT, REDIS_PUBSUB, REST_MANAGER, BINANCE, OKX, TIME_IN_EXCHANGE, TIME_IN_ARB
+from config.binancefuture_okx_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, REDIS_HOST, REDIS_PORT, REDIS_PUBSUB, REST_MANAGER, REST_PORT, BINANCE, OKX, TIME_IN_EXCHANGE, TIME_IN_ARB
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]
 logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{RECORDING_COIN}.log"))
@@ -15,7 +15,7 @@ logger.info(f"init {NAME}")
 
 class SymmetricArbitrage:
     TRANS_STRATEGY = 1.001801531302 * 1.0002
-    CREATE_ORDER = REST_MANAGER + '/create_order'
+    CREATE_ORDER = f"{REST_MANAGER}:{REST_PORT}" + '/create_order'
 
     def __init__(self, ex, symbol, sides):
         # symmetric parameter (either A or B)
