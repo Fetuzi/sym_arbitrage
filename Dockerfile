@@ -3,7 +3,7 @@ FROM python:3.9-slim
 
 # Install networking tools and vim
 RUN apt-get update \
-    && apt-get install -y netcat iputils-ping curl vim \
+    && apt-get install -y netcat-openbsd iputils-ping curl vim \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
