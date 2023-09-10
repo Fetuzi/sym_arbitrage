@@ -26,8 +26,8 @@ class SymmetricArbitrage:
         # status
         self.time = int(time.time() * 1000)
         self.contract = 0  # BINANCE contract
-        self.ask = {BINANCE: 0, OKX: 0}
-        self.bid = {BINANCE: 0, OKX: 0}
+        self.ask = {BINANCE: 0.0, OKX: 0.0}
+        self.bid = {BINANCE: 0.0, OKX: 0.0}
         self.exchange_time = {BINANCE: int(time.time() * 1000), OKX: int(time.time() * 1000)}
 
         # Redis
@@ -78,8 +78,8 @@ class SymmetricArbitrage:
     def _update(self, data):
         self.time = int(time.time() * 1000)
 
-        self.ask[data['ex']] = data['a']
-        self.bid[data['ex']] = data['b']
+        self.ask[data['ex']] = float(data['a'])
+        self.bid[data['ex']] = float(data['b'])
         self.exchange_time[data['ex']] = data['t']
 
     def _arb(self):
