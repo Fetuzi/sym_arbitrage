@@ -82,6 +82,6 @@ case "$1" in
     clear_logs "hk008-free" "~/sym_arbitrage"
     ;;
   *)
-    echo "Invalid command. Usage: ./remote.sh pull|up|down|build|ps"
+    echo "Invalid command. Usage: ./remote.sh pull|up|down|build|ps|log|clear"
     ;;
 esac
