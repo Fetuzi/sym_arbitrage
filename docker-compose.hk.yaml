@@ -5,6 +5,17 @@ services:
     networks:
       - coin-network
 
+  coin-mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: o29nap02nn
+
+
   rest_manager:
     build: .
     depends_on:
@@ -86,3 +97,6 @@ services:
 networks:
   coin-network:
     driver: bridge
+
+volumes:
+  mongodb_data:

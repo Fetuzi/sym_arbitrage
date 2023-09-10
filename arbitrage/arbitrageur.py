@@ -46,6 +46,7 @@ class SymmetricArbitrage:
         logger.info(f"{response=}")
         increment = 1 if side == 'buy' else -1
         self.contract = self.contract if dry_run else self.contract + increment
+        logger.info(f'{self.contract=}')
 
     def run(self):
         pubsub = None
