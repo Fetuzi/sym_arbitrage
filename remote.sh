@@ -31,6 +31,14 @@ clear_logs() {
   ssh $server "cd $dir/log && rm -f *"
 }
 
+# Function to sync a local file to a remote directory on a server
+sync_file() {
+  local file=$1
+  local server=$2
+  local remote_dir=$3
+  scp "$file" "$server:$remote_dir"
+}
+
 # Create log directories if they don't exist
 mkdir -p log/tokyo_log
 mkdir -p log/hk_log
@@ -81,7 +89,11 @@ case "$1" in
     clear_logs "tokyo008-free" "~/sym_arbitrage"
     clear_logs "hk008-free" "~/sym_arbitrage"
     ;;
+  sync)
+    sync_file "./config/binancefuture_okx_arb.py" "tokyo008-free" "~/sym_arbitrage/config/binancefuture_okx_arb.py"
+    sync_file "./config/binancefuture_okx_arb.py" "hk008-free" "~/sym_arbitrage/config/binancefuture_okx_arb.py"
+    ;;
   *)
-    echo "Invalid command. Usage: ./remote.sh pull|up|down|build|ps|log|clear"
+    echo "Invalid command. Usage: ./remote.sh pull|up|down|build|ps|log|clear|sync"
     ;;
 esac
