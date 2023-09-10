@@ -38,9 +38,10 @@ async def create_order(
         type: str,
         side: str,
         amount: float,
-        price: float
+        price: float,
+        dry_run: bool = False
 ):
-    logger.info(f'Send request: {symbol=}, {type=}, {side=}, {amount=}, {price=}')
+    logger.info(f'Send request: {symbol=}, {type=}, {side=}, {amount=}, {price=}, {dry_run=}')
     _id = uuid.uuid4().hex
     data = {
         "id": _id,
@@ -49,7 +50,8 @@ async def create_order(
         "type": type,
         "side": side,
         "amount": amount,
-        "price": price
+        "price": price,
+        "dry_run": dry_run
     }
 
     queue_handler.enqueue(data)

@@ -29,7 +29,10 @@ try:
         logger.info(f"Received message: {message}")
 
         if message['topic'] == 'create':
-            res = okx.create_order(message['symbol'], message['type'], message['side'], message['amount'], message['price'])
-            logger.info(f"{res=}")
+            if message['dry_run']:
+                logger.info(f"Dry run order: {message=}")
+            else:
+                res = okx.create_order(message['symbol'], message['type'], message['side'], message['amount'], message['price'])
+                logger.info(f"{res=}")
 except KeyboardInterrupt:
     queue_handler.close()
