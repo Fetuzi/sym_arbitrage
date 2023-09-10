@@ -29,7 +29,7 @@ async def subscribe_to_websocket(uri, redis_client):
 
                         # Publish to Redis
                         redis_client.publish(REDIS_PUBSUB, json.dumps({'ex': OKX, 'b': data['bids'][0][0],
-                                                                       'a': data['asks'][0][0], 't': int(data['T'])}))
+                                                                       'a': data['asks'][0][0], 't': int(data['ts'])}))
                     except asyncio.TimeoutError:
                         logger.warning("No data received for 3 seconds, retrying...")
                         break
