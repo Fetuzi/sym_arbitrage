@@ -89,11 +89,11 @@ class SymmetricArbitrage:
         # dry_run = not self._risk()  # If pass risk check, not use dry_run
         dry_run = True
         if time_gap and self.bid[BINANCE] > self.ask[OKX] * self.TRANS_STRATEGY:
-            logger.info(f"arbitrage: {self.bid[BINANCE]=}, {self.ask[OKX]=}")
+            logger.info(f"arbitrage: {self.bid[BINANCE]=} > {self.ask[OKX]=}")
             side = self.sides[0]
             self._execute_order(side, dry_run)
         if time_gap and self.bid[OKX] > self.ask[BINANCE] * self.TRANS_STRATEGY:
-            logger.info(f"arbitrage: {self.bid[OKX]=}, {self.ask[BINANCE]=}")
+            logger.info(f"arbitrage: {self.bid[OKX]=} > {self.ask[BINANCE]=}")
             side = self.sides[1]
             self._execute_order(side, dry_run)
 
