@@ -8,7 +8,7 @@ set_local_env() {
 }
 
 set_dev_env() {
-  export PYTHONPATH="/app"
+  export PYTHONPATH="/Users/yite/Projects/sym_arbitrage"
   export DEPLOYMENT="DEV"
   echo "Development environment variables set."
 }
