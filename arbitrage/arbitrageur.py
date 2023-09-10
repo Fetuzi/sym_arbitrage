@@ -19,6 +19,9 @@ class SymmetricArbitrage:
         # status
         self.time = int(time.time() * 1000)
         self.contract = {BINANCE: 0, OKX: 0}
+        self.ask = {BINANCE: 0, OKX: 0}
+        self.bid = {BINANCE: 0, OKX: 0}
+        self.exchange_time = {BINANCE: int(time.time() * 1000), OKX: int(time.time() * 1000)}
 
         # Redis
         self.redis_conn = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
@@ -44,8 +47,16 @@ class SymmetricArbitrage:
             if pubsub:
                 pubsub.close()
 
+    def _update(self, data):
+        self.time = int(time.time() * 1000)
+
+        self.ask[data['ex']] = data['a']
+        self.bid[data['ex']] = data['b']
+        self.exchange_time[data['ex']] = data['t']
+
     def _arb(self):
-        pass
+        if self.time - max(self.exchange_time[BINANCE], self.exchange_time[OKX]) < 100:
+            if
 
     def _liq(self):
         pass

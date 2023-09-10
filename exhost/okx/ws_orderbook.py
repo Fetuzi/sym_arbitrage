@@ -2,6 +2,7 @@ import os
 import json
 import asyncio
 from asyncio import Lock
+import uuid
 import websockets
 from general.logger import setup_logger
 from config.binancefuture_okx_arb import (

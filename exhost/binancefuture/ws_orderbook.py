@@ -2,6 +2,7 @@ import os
 import asyncio
 from asyncio import Lock, TimeoutError
 import websockets
+import uuid
 from general.logger import setup_logger
 from config.binancefuture_okx_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, RELAY_PORT
 
