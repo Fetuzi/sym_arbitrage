@@ -76,7 +76,7 @@ services:
       - ws_publisher_hk
       - ws_publisher_tokyo
     entrypoint: [ "/app/entrypoint.sh", "tokyo" ]
-    command: ["python", "arbitrage/arbitrage_binancefuture.py"]
+    command: ["python", "arbitrage/arbitrageur_binancefuture.py"]
     volumes:
       - ./log:/app/log
       - ./config/binancefuture_okx_arb.py:/app/config/binancefuture_okx_arb.py
