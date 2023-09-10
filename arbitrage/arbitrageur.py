@@ -47,7 +47,7 @@ class SymmetricArbitrage:
         increment = 1 if side == 'buy' else -1
         self.contract = self.contract if dry_run else self.contract + increment
 
-    def run(self, exchange, symbol):
+    def run(self):
         pubsub = None
         try:
             pubsub = self.redis_conn.pubsub()
