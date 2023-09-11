@@ -15,8 +15,8 @@ logger.info(f"init {NAME}")
 
 
 class SymmetricArbitrage:
-    TRANS_STRATEGY = 1.001801531302 * 1.0002
-    # TRANS_STRATEGY = 1
+    # TRANS_STRATEGY = 1.001801531302 * 1.0002
+    TRANS_STRATEGY = 1.0005
     CREATE_ORDER = f"{REST_MANAGER}/create_order"
 
     def __init__(self, ex, symbol, sides):
@@ -88,29 +88,30 @@ class SymmetricArbitrage:
         self.exchange_time[data['ex']] = data['t']
 
     def _arb(self):
-        logger.debug("Determine by arb")
         time_gap = self.time - min(self.exchange_time[BINANCE], self.exchange_time[OKX]) < TIME_IN_ARB
         time_gap = time_gap and abs(self.exchange_time[BINANCE] - self.exchange_time[OKX]) < TIME_IN_EXCHANGE
-        # dry_run = not self._risk()  # If pass risk check, not use dry_run
-        dry_run = True
+        dry_run = not self._risk()  # If pass risk check, not use dry_run
+        logger.debug(f'{time_gap=}, {dry_run=}')
+        # dry_run = True
         if time_gap and self.bid[BINANCE] > self.ask[OKX] * self.TRANS_STRATEGY:
-            logger.info(f"arbitrage: {self.bid[BINANCE]=} > {self.ask[OKX]=}")
+            logger.info(f"arbitrage: {self.bid[BINANCE]=} > {self.ask[OKX]=}, {self.TRANS_STRATEGY =}")
             side = self.sides[0]
             self._execute_order(side, dry_run)
         if time_gap and self.bid[OKX] > self.ask[BINANCE] * self.TRANS_STRATEGY:
-            logger.info(f"arbitrage: {self.bid[OKX]=} > {self.ask[BINANCE]=}")
+            logger.info(f"arbitrage: {self.bid[OKX]=} > {self.ask[BINANCE]=}, {self.TRANS_STRATEGY =}")
             side = self.sides[1]
             self._execute_order(side, dry_run)
 
     def _liq(self):
-        logger.debug("Determine by lib")
+        logger.debug(f"Determine by lib, {self.contract=}")
+
         if self.contract > 0 and self.bid[BINANCE] >= self.ask[OKX]:
             side = self.sides[0]
-            logger.info(f"liquidate: {side} 1 contract")
+            logger.info(f"liquidate:")
             self._execute_order(side, False)  # Price is arbitrary
         if self.contract < 0 and self.ask[BINANCE] <= self.bid[OKX]:
             side = self.sides[1]
-            logger.info(f"liquidate: {side} 1 in contract")
+            logger.info(f"liquidate:")
             self._execute_order(side, False)  # Price is arbitrary
 
 
