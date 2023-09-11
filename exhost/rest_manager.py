@@ -1,7 +1,6 @@
 import os
 from typing import Union
 import time
-import json
 import uuid
 from fastapi import FastAPI
 from config.binancefuture_okx_arb import LOG_DIR, TIMESTAMP, REDIS_HOST, REDIS_PORT, REDIS_QUEUE
