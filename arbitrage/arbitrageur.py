@@ -104,14 +104,13 @@ class SymmetricArbitrage:
 
     def _liq(self):
         logger.debug(f"Determine by lib, {self.contract=}")
-
         if self.contract > 0 and self.bid[BINANCE] >= self.ask[OKX]:
             side = self.sides[0]
-            logger.info(f"liquidate:")
+            logger.info(f"liquidate: {self.bid[BINANCE]=} >= {self.ask[OKX]=}")
             self._execute_order(side, False)  # Price is arbitrary
         if self.contract < 0 and self.ask[BINANCE] <= self.bid[OKX]:
             side = self.sides[1]
-            logger.info(f"liquidate:")
+            logger.info(f"liquidate: {self.ask[BINANCE]=} >= {self.bid[OKX]=}")
             self._execute_order(side, False)  # Price is arbitrary
 
 
