@@ -32,6 +32,7 @@ try:
                 continue
             if message.get('dry_run'):
                 logger.info(f"Dry run order: {message=}")
+                continue
 
             if message.get('topic') == 'create':
                 if message.get('type') == 'market':
