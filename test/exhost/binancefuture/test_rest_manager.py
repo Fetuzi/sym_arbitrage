@@ -6,6 +6,7 @@ from general.logger import setup_logger
 
 class TestHostedFastAPI(unittest.IsolatedAsyncioTestCase):
     BASE_URL = REST_MANAGER  # Replace with your hosted app URL
+    # BASE_URL = "http://ec2-52-198-41-165.ap-northeast-1.compute.amazonaws.com:8080"
     logger = setup_logger(__name__, None, logging.INFO)
     async def asyncSetUp(self):
         self.client = httpx.AsyncClient()
@@ -27,8 +28,9 @@ class TestHostedFastAPI(unittest.IsolatedAsyncioTestCase):
             "side": "buy",
             "amount": 1,
             "price": 50.0,
-            "dry_run": True
+            "dry_run": False
         }
+
         res = await self.client.get(f"{self.BASE_URL}/create_order", params=params)
         self.logger.info("async call before using response")
         self.logger.info(f"{res=}")
