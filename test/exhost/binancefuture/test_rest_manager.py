@@ -26,7 +26,7 @@ class TestHostedFastAPI(unittest.IsolatedAsyncioTestCase):
             "type": "limit",
             "side": "buy",
             "amount": 1,
-            "price": 64.0,
+            "price": 50.0,
             "dry_run": True
         }
         res = await self.client.get(f"{self.BASE_URL}/create_order", params=params)

@@ -57,8 +57,8 @@ all() {
   run_docker_command "tokyo008-free" "sym_arbitrage" "docker-compose.tokyo.yaml" "build"
   run_docker_command "hk008-free" "sym_arbitrage" "docker-compose.hk.yaml" "build"
 
-  run_docker_command "tokyo008-free" "sym_arbitrage" "docker-compose.tokyo.yaml" "up" &
-  run_docker_command "hk008-free" "sym_arbitrage" "docker-compose.hk.yaml" "up"
+  run_docker_command "tokyo008-free" "sym_arbitrage" "docker-compose.tokyo.yaml" "up -d" &
+  run_docker_command "hk008-free" "sym_arbitrage" "docker-compose.hk.yaml" "up -d"
 
   sleep 10
 
