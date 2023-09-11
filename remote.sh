@@ -120,7 +120,9 @@ case "$1" in
     sync_file "./config/binancefuture_okx_arb.py" "tokyo008-free" "~/sym_arbitrage/config/binancefuture_okx_arb.py" &
     sync_file "./config/binancefuture_okx_arb.py" "hk008-free" "~/sym_arbitrage/config/binancefuture_okx_arb.py"
     ;;
+  all)
+    all
   *)
-    echo "Invalid command. Usage: ./remote.sh pull|up|down|build|ps|log|clear|sync"
+    echo "Invalid command. Usage: ./remote.sh pull|up|down|build|ps|log|clear|sync|all"
     ;;
 esac
