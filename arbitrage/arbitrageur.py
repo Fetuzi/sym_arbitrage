@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 import traceback
@@ -9,7 +10,7 @@ from general.logger import setup_logger
 from config.binancefuture_okx_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, REDIS_HOST, REDIS_PORT, REDIS_PUBSUB, REST_MANAGER, BINANCE, OKX, TIME_IN_EXCHANGE, TIME_IN_ARB
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]
-logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{RECORDING_COIN}.log"))
+logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{RECORDING_COIN}.log"), logging.DEBUG)
 logger.info(f"init {NAME}")
 
 
@@ -63,7 +64,7 @@ class SymmetricArbitrage:
 
             for message in pubsub.listen():
                 data = json.loads(message['data'].decode('utf-8'))
-                logger.info(f'{data=}')
+                logger.debug(f'{data=}')
                 self._update(data)
                 self._arb()
                 self._liq()
@@ -87,6 +88,7 @@ class SymmetricArbitrage:
         self.exchange_time[data['ex']] = data['t']
 
     def _arb(self):
+        logger.debug("Determine by arb")
         time_gap = self.time - min(self.exchange_time[BINANCE], self.exchange_time[OKX]) < TIME_IN_ARB
         time_gap = time_gap and abs(self.exchange_time[BINANCE] - self.exchange_time[OKX]) < TIME_IN_EXCHANGE
         # dry_run = not self._risk()  # If pass risk check, not use dry_run
@@ -101,6 +103,7 @@ class SymmetricArbitrage:
             self._execute_order(side, dry_run)
 
     def _liq(self):
+        logger.debug("Determine by lib")
         if self.contract > 0 and self.bid[BINANCE] >= self.ask[OKX]:
             side = self.sides[0]
             logger.info(f"liquidate: {side} 1 contract")
