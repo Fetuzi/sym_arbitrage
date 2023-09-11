@@ -29,7 +29,7 @@ class SymmetricArbitrage:
         self.contract = 0  # BINANCE contract
         self.ask = {BINANCE: 0.0, OKX: 0.0}
         self.bid = {BINANCE: 0.0, OKX: 0.0}
-        self.exchange_time = {BINANCE: int(time.time() * 1000), OKX: int(time.time() * 1000)}
+        self.exchange_time = {BINANCE: 0, OKX: 0}
 
         # Redis
         self.redis_conn = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
