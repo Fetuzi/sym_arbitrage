@@ -39,6 +39,33 @@ sync_file() {
   scp "$file" "$server:$remote_dir"
 }
 
+all() {
+  rm -rf ./log/*
+
+  run_docker_command "tokyo008-free" "sym_arbitrage" "docker-compose.tokyo.yaml" "down"
+  run_docker_command "hk008-free" "sym_arbitrage" "docker-compose.hk.yaml" "down"
+
+  run_git_pull "tokyo008-free" "sym_arbitrage"
+  run_git_pull "hk008-free" "sym_arbitrage"
+
+  sync_file "./config/binancefuture_okx_arb.py" "tokyo008-free" "~/sym_arbitrage/config/binancefuture_okx_arb.py" &
+  sync_file "./config/binancefuture_okx_arb.py" "hk008-free" "~/sym_arbitrage/config/binancefuture_okx_arb.py"
+
+  clear_logs "tokyo008-free" "~/sym_arbitrage"
+  clear_logs "hk008-free" "~/sym_arbitrage"
+
+  run_docker_command "tokyo008-free" "sym_arbitrage" "docker-compose.tokyo.yaml" "build"
+  run_docker_command "hk008-free" "sym_arbitrage" "docker-compose.hk.yaml" "build"
+
+  run_docker_command "tokyo008-free" "sym_arbitrage" "docker-compose.tokyo.yaml" "up" &
+  run_docker_command "hk008-free" "sym_arbitrage" "docker-compose.hk.yaml" "up"
+
+  sleep 10
+
+  copy_logs "tokyo008-free" "~/sym_arbitrage/log" "log/tokyo_log" &
+  copy_logs "hk008-free" "~/sym_arbitrage/log" "log/hk_log"
+}
+
 # Create log directories if they don't exist
 mkdir -p log/tokyo_log
 mkdir -p log/hk_log
