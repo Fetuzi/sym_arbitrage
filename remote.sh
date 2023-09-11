@@ -122,6 +122,7 @@ case "$1" in
     ;;
   all)
     all
+    ;;
   *)
     echo "Invalid command. Usage: ./remote.sh pull|up|down|build|ps|log|clear|sync|all"
     ;;
