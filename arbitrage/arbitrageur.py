@@ -7,7 +7,7 @@ import redis
 import requests
 
 from general.logger import setup_logger
-from config.binancefuture_okx_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, REDIS_HOST, REDIS_PORT, REDIS_PUBSUB, REST_MANAGER, BINANCE, OKX, TIME_IN_EXCHANGE, TIME_IN_ARB
+from config.binancefuture_okx_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, REDIS_HOST, REDIS_PORT, REDIS_PUBSUB, REST_MANAGER, BINANCE, OKX, TIME_IN_EXCHANGE, TIME_IN_ARB, FEE_RATE
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]
 logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{RECORDING_COIN}.log"), logging.DEBUG)
@@ -15,19 +15,17 @@ logger.info(f"init {NAME}")
 
 
 class SymmetricArbitrage:
-    # TRANS_STRATEGY = 1.001801531302 * 1.0002
-    TRANS_STRATEGY = 1.0005
     CREATE_ORDER = f"{REST_MANAGER}/create_order"
 
-    def __init__(self, ex, symbol, sides):
+    def __init__(self, ex, symbol):
         # symmetric parameter (either A or B)
         self.ex = ex
+        self.other_ex = BINANCE if ex == OKX else OKX
         self.symbol = symbol
-        self.sides = sides  # [sell, buy] in BINANCE, [buy, sell] in OKX
 
         # status
         self.time = int(time.time() * 1000)
-        self.contract = 0  # BINANCE contract
+        self.contract = 0  # contract
         self.ask = {BINANCE: 0.0, OKX: 0.0}
         self.bid = {BINANCE: 0.0, OKX: 0.0}
         self.exchange_time = {BINANCE: 0, OKX: 0}
@@ -91,26 +89,25 @@ class SymmetricArbitrage:
         time_gap = self.time - min(self.exchange_time[BINANCE], self.exchange_time[OKX]) < TIME_IN_ARB
         time_gap = time_gap and abs(self.exchange_time[BINANCE] - self.exchange_time[OKX]) < TIME_IN_EXCHANGE
         dry_run = not self._risk()  # If pass risk check, not use dry_run
-        logger.debug(f'{time_gap=}, {dry_run=}')
-        # dry_run = True
-        if time_gap and self.bid[BINANCE] > self.ask[OKX] * self.TRANS_STRATEGY:
-            logger.info(f"arbitrage: {self.bid[BINANCE]=} > {self.ask[OKX]=}, {self.TRANS_STRATEGY =}")
-            side = self.sides[0]
-            self._execute_order(side, dry_run)
-        if time_gap and self.bid[OKX] > self.ask[BINANCE] * self.TRANS_STRATEGY:
-            logger.info(f"arbitrage: {self.bid[OKX]=} > {self.ask[BINANCE]=}, {self.TRANS_STRATEGY =}")
-            side = self.sides[1]
-            self._execute_order(side, dry_run)
+        buy_gap = 2 * (FEE_RATE[self.other_ex] * self.bid[self.other_ex] + FEE_RATE[self.ex] * self.ask[self.ex])
+        sell_gap = 2 * (FEE_RATE[self.ex] * self.bid[self.ex] + FEE_RATE[self.other_ex] * self.ask[self.other_ex])
+        logger.debug(f'{time_gap=}, {dry_run=}, {buy_gap=}, {sell_gap=}')
+        if time_gap and self.bid[self.other_ex] - self.ask[self.ex] > buy_gap:
+            logger.info(f'arbitrage: {self.other_ex}.bid - {self.ex}.ask > {buy_gap}')
+            self._execute_order('buy', dry_run)
+        if time_gap and self.bid[self.ex] - self.ask[self.other_ex] > sell_gap:
+            logger.info(f"arbitrage: {self.ex}.bid - {self.other_ex}.ask > {sell_gap}")
+            self._execute_order('sell', dry_run)
 
     def _liq(self):
         logger.debug(f"Determine by lib, {self.contract=}")
-        if self.contract > 0 and self.bid[BINANCE] >= self.ask[OKX]:
-            side = self.sides[0]
-            logger.info(f"liquidate: {self.bid[BINANCE]=} >= {self.ask[OKX]=}")
-            self._execute_order(side, False)  # Price is arbitrary
-        if self.contract < 0 and self.ask[BINANCE] <= self.bid[OKX]:
-            side = self.sides[1]
-            logger.info(f"liquidate: {self.ask[BINANCE]=} >= {self.bid[OKX]=}")
-            self._execute_order(side, False)  # Price is arbitrary
+        if self.contract > 0 and self.bid[self.ex] >= self.ask[self.other_ex]:
+            logger.info(f'liquidate: {self.ex}.bid >= {self.other_ex}.ask')
+            logger.info(f'liquidate: {self.bid[self.ex]} >= {self.ask[self.other_ex]}')
+            self._execute_order('sell', False)  # Price is arbitrary
+        if self.contract < 0 and self.ask[self.ex] <= self.bid[self.other_ex]:
+            logger.info(f'liquidate: {self.ex}.ask <= {self.other_ex}.bid')
+            logger.info(f'liquidate: {self.ask[self.ex]} <= {self.bid[self.other_ex]}')
+            self._execute_order('buy', False)
 
 
