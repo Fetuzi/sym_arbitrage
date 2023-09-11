@@ -15,7 +15,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: o29nap02nn
 
-
   rest_manager:
     build: .
     depends_on:
@@ -86,6 +85,7 @@ services:
     depends_on:
       - ws_publisher_hk
       - ws_publisher_tokyo
+      - rest_manager
     entrypoint: [ "/app/entrypoint.sh", "hk" ]
     command: [ "python", "arbitrage/arbitrageur_okx.py" ]
     volumes:
