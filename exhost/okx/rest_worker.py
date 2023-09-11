@@ -30,13 +30,22 @@ try:
         try:
             message = queue_handler.dequeue()
             logger.info(f"Received message: {message}")
+            if message is None:
+                logger.warning("Received empty message")
+                continue
+            if message.get('dry_run'):
+                logger.info(f"Dry run order: {message=}")
 
-            if message['topic'] == 'create':
-                if message['dry_run']:
-                    logger.info(f"Dry run order: {message=}")
+            if message.get('topic') == 'create':
+                if message.get('type') == 'market':
+                    res = okx.create_order(message['symbol'], 'market', message['side'], message['amount'])
+                    logger.info(f"Order created: {res=}")
+                elif message.get('type') == 'limit':
+                    res = okx.create_order(message['symbol'], 'limit', message['side'], message['amount'],
+                                               message['price'])
+                    logger.info(f"Order created: {res=}")
                 else:
-                    res = okx.create_order(message['symbol'], message['type'], message['side'], message['amount'], message['price'])
-                    logger.info(f"{res=}")
+                    logger.error(f"Unexpected market type: {message.get('type')}")
         except ccxt.NetworkError as e:
             logger.error(f"Network error: {e}\n{traceback.format_exc()}")
         except ccxt.ExchangeError as e:
