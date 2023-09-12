@@ -28,26 +28,19 @@ try:
                 continue
 
             if message.get('topic') == 'create':
-                params = {
-                    "symbol": message["symbol"],
-                    "side": message["side"].upper()
-                }
                 if message.get('type') == 'market':
-                    params.update({
-                        'type': "MARKET",
-                        'quantity': message['amount'],
-                        'price': message['price']
-                    })
-                    res = cm_futures_client.new_order(**params)
+                    res = cm_futures_client.new_order(symbol=message["symbol"],
+                                                      side=message["side"].upper(),
+                                                      type='MARKET',
+                                                      quantitiy=message["size"])
                     logger.info(f"Order created: {res=}")
                 elif message.get('type') == 'limit':
-                    params.update({
-                        'type': "LIMIT",
-                        'timeInForce': 'GTC',
-                        'quantity': message['amount'],
-                        'price': message['price']
-                    })
-                    res = cm_futures_client.new_order(**params)
+                    res = cm_futures_client.new_order(symbol=message["symbol"],
+                                                      side=message["side"].upper(),
+                                                      type="LIMIT",
+                                                      quantity=message["size"],
+                                                      timeInForce="GTC",
+                                                      price=message["price"])
                     logger.info(f"Order created: {res=}")
                 else:
                     logger.error(f"Unexpected market type: {message.get('type')}")

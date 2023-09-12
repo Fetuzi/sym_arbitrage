@@ -23,7 +23,7 @@ class TestHostedFastAPI(unittest.IsolatedAsyncioTestCase):
 
     async def test_create_order(self):
         params = {
-            "symbol": "LTC/USDT:USDT",
+            "symbol": "LTCUSDT",
             "type": "limit",
             "side": "buy",
             "amount": 1,
