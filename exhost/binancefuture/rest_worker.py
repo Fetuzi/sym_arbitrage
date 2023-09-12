@@ -21,9 +21,7 @@ try:
         try:
             message = queue_handler.dequeue()
             logger.info(f"Received message: {message}")
-            if message is None:
-                logger.warning("Received empty message")
-                continue
+
             if message.get('dry_run'):
                 logger.info(f"Dry run order: {message=}")
                 continue
@@ -33,8 +31,8 @@ try:
                     res = cm_futures_client.new_order(symbol=message["symbol"],
                                                       side=message["side"].upper(),
                                                       type='MARKET',
-                                                      quantitiy=message["amount"],
-                                                      positionSide="BOTH")
+                                                      quantitiy=message["amount"]
+                                                      )
                     logger.info(f"Order created: {res=}")
                 elif message.get('type') == 'limit':
                     res = cm_futures_client.new_order(symbol=message["symbol"],
@@ -42,8 +40,7 @@ try:
                                                       type="LIMIT",
                                                       quantity=message["amount"],
                                                       timeInForce="GTC",
-                                                      price=message["price"],
-                                                      positionSide="BOTH")
+                                                      price=message["price"])
                     logger.info(f"Order created: {res=}")
                 else:
                     logger.error(f"Unexpected market type: {message.get('type')}")
