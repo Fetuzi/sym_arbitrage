@@ -1,4 +1,5 @@
 import os
+import traceback
 from binance.cm_futures import CMFutures
 from binance.error import ClientError
 from general.logger import setup_logger
@@ -53,6 +54,8 @@ try:
                     error.status_code, error.error_code, error.error_message
                 )
             )
+        except Exception as e:
+            logger.error(f"An unexpected error occurred: {e}\n{traceback.format_exc()}")
 
 except KeyboardInterrupt:
     queue_handler.close()
