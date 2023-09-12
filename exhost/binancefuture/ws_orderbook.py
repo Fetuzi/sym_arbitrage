@@ -19,7 +19,7 @@ async def source_connection(source_uri, relay_to_clients):
             async with websockets.connect(source_uri) as websocket:
                 while True:
                     try:
-                        logger.info("About to receive message from source WebSocket")
+                        logger.debug("About to receive message from source WebSocket")
                         message = await asyncio.wait_for(websocket.recv(), timeout=5)  # 5-second timeout
                         logger.info(f"Received: {message=}")
                         await relay_to_clients(message)
@@ -36,10 +36,10 @@ clients_lock = Lock()
 # Relaying messages to all connected clients
 async def relay_to_clients(message):
     async with clients_lock:
-        logger.info("Acquired lock, about to send message to clients")
+        logger.debug("Acquired lock, about to send message to clients")
         if clients:
             await asyncio.gather(*(client.send(message) for client in clients))
-        logger.info("Message relayed to clients")
+        logger.debug("Message relayed to clients")
 
 async def relay_server(websocket, path):
     async with clients_lock:
