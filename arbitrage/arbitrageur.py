@@ -44,8 +44,8 @@ class SymmetricArbitrage:
             "dry_run": dry_run
         }
         logger.info(f"request {params=}")
-        response = requests.get(self.CREATE_ORDER, params=params)
-        logger.info(f"{response=}")
+        res = requests.get(self.CREATE_ORDER, params=params)
+        logger.info(f"{res.status_code}, {res.json()}")
         increment = 1 if side == 'buy' else -1
         self.contract = self.contract if dry_run else self.contract + increment
         logger.info(f'{self.contract=}')
