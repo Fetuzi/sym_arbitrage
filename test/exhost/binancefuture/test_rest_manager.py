@@ -27,7 +27,7 @@ class TestHostedFastAPI(unittest.IsolatedAsyncioTestCase):
             "type": "limit",
             "side": "buy",
             "amount": 1,
-            "price": 50.0,
+            "price": 55.0,
             "dry_run": False
         }
 

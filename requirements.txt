@@ -6,3 +6,4 @@ asynctest
 pika
 websockets
 redis
+binance-futures-connector

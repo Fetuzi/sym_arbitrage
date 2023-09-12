@@ -1,20 +1,13 @@
 import os
-import ccxt
-import json
-import traceback
+from binance.cm_futures import CMFutures
+from binance.error import ClientError
 from general.logger import setup_logger
 from general.queue import RedisQueueHandler
 from config.binancefuture_okx_arb import (LOG_DIR, TIMESTAMP, BINANCE_API_KEY, BINANCE_SECRET_KEY,
                                           REDIS_HOST, REDIS_PORT, REDIS_QUEUE)
 
-binance = ccxt.binance({
-    'apiKey': BINANCE_API_KEY,
-    'secret': BINANCE_SECRET_KEY,
-    'enableRateLimit': True,
-    'options': {
-        'defaultType': 'future',
-    }
-})
+
+cm_futures_client = CMFutures(key=BINANCE_API_KEY, secret=BINANCE_SECRET_KEY)
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]
 logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}.log"))
@@ -35,27 +28,36 @@ try:
                 continue
 
             if message.get('topic') == 'create':
+                params = {
+                    "symbol": message["symbol"],
+                    "side": message["side"].upper()
+                }
                 if message.get('type') == 'market':
-                    res = binance.create_order(message['symbol'], 'market', message['side'], message['amount'])
+                    params.update({
+                        'type': "MARKET",
+                        'quantity': message['amount'],
+                        'price': message['price']
+                    })
+                    res = cm_futures_client.new_order(**params)
                     logger.info(f"Order created: {res=}")
                 elif message.get('type') == 'limit':
-                    res = binance.create_order(message['symbol'], 'limit', message['side'], message['amount'], message['price'])
+                    params.update({
+                        'type': "LIMIT",
+                        'timeInForce': 'GTC',
+                        'quantity': message['amount'],
+                        'price': message['price']
+                    })
+                    res = cm_futures_client.new_order(**params)
                     logger.info(f"Order created: {res=}")
                 else:
                     logger.error(f"Unexpected market type: {message.get('type')}")
 
-        except ccxt.NetworkError as e:
-            logger.error(f"Network error: {e}\n{traceback.format_exc()}")
-        except ccxt.ExchangeError as e:
-            logger.error(f"Exchange error: {e}\n{traceback.format_exc()}")
-        except ccxt.BaseError as e:
-            logger.error(f"CCXT Base error: {e}\n{traceback.format_exc()}")
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON decode error: {e}\n{traceback.format_exc()}")
-        except KeyError as e:
-            logger.error(f"Missing key in message: {e}\n{traceback.format_exc()}")
-        except Exception as e:
-            logger.error(f"An unexpected error occurred: {e}\n{traceback.format_exc()}")
+        except ClientError as error:
+            logger.error(
+                "Found error. status: {}, error code: {}, error message: {}".format(
+                    error.status_code, error.error_code, error.error_message
+                )
+            )
 
 except KeyboardInterrupt:
     queue_handler.close()
