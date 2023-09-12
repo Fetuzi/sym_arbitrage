@@ -100,7 +100,7 @@ class SymmetricArbitrage:
             self._execute_order('sell', dry_run)
 
     def _liq(self):
-        logger.debug(f"Determine by lib, {self.contract=}")
+        logger.debug(f"Determine by liq, {self.contract=}")
         if self.contract > 0 and self.bid[self.ex] >= self.ask[self.other_ex]:
             logger.info(f'liquidate: {self.ex}.bid >= {self.other_ex}.ask')
             logger.info(f'liquidate: {self.bid[self.ex]} >= {self.ask[self.other_ex]}')
