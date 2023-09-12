@@ -1,6 +1,6 @@
 import os
 import traceback
-from binance.cm_futures import CMFutures
+from binance.um_futures import UMFutures
 from binance.error import ClientError
 from general.logger import setup_logger
 from general.queue import RedisQueueHandler
@@ -8,7 +8,7 @@ from config.binancefuture_okx_arb import (LOG_DIR, TIMESTAMP, BINANCE_API_KEY, B
                                           REDIS_HOST, REDIS_PORT, REDIS_QUEUE)
 
 
-cm_futures_client = CMFutures(key=BINANCE_API_KEY, secret=BINANCE_SECRET_KEY)
+um_futures_client = UMFutures(key=BINANCE_API_KEY, secret=BINANCE_SECRET_KEY)
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]
 logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}.log"))
@@ -28,19 +28,20 @@ try:
 
             if message.get('topic') == 'create':
                 if message.get('type') == 'market':
-                    res = cm_futures_client.new_order(symbol='LTCUSDT',
+                    res = um_futures_client.new_order(symbol=message['symbol'],
                                                       side=message["side"].upper(),
                                                       type='MARKET',
-                                                      quantitiy=message["amount"]
+                                                      quantity=message["amount"]
                                                       )
                     logger.info(f"Order created: {res=}")
                 elif message.get('type') == 'limit':
-                    res = cm_futures_client.new_order(symbol=message["symbol"],
+                    res = um_futures_client.new_order(symbol=message['symbol'],
                                                       side=message["side"].upper(),
-                                                      type="LIMIT",
+                                                      type="MARKET",
                                                       quantity=message["amount"],
                                                       timeInForce="GTC",
-                                                      price=message["price"])
+                                                      price=message["price"]
+                                                      )
                     logger.info(f"Order created: {res=}")
                 else:
                     logger.error(f"Unexpected market type: {message.get('type')}")
