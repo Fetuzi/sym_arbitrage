@@ -42,8 +42,7 @@ try:
                     res = okx.create_order(message['symbol'], 'market', message['side'], message['amount'])
                     logger.info(f"Order created: {res=}")
                 elif message.get('type') == 'limit':
-                    res = okx.create_order(message['symbol'], 'limit', message['side'], message['amount'],
-                                               message['price'])
+                    res = okx.create_order(message['symbol'], 'limit', message['side'], message['amount'], message['price'])
                     logger.info(f"Order created: {res=}")
                 else:
                     logger.error(f"Unexpected market type: {message.get('type')}")

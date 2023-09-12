@@ -33,14 +33,14 @@ try:
                     res = cm_futures_client.new_order(symbol=message["symbol"],
                                                       side=message["side"].upper(),
                                                       type='MARKET',
-                                                      quantitiy=message["size"],
+                                                      quantitiy=message["amount"],
                                                       positionSide="BOTH")
                     logger.info(f"Order created: {res=}")
                 elif message.get('type') == 'limit':
                     res = cm_futures_client.new_order(symbol=message["symbol"],
                                                       side=message["side"].upper(),
                                                       type="LIMIT",
-                                                      quantity=message["size"],
+                                                      quantity=message["amount"],
                                                       timeInForce="GTC",
                                                       price=message["price"],
                                                       positionSide="BOTH")
