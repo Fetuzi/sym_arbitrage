@@ -28,7 +28,7 @@ try:
 
             if message.get('topic') == 'create':
                 if message.get('type') == 'market':
-                    res = cm_futures_client.new_order(symbol=message["symbol"],
+                    res = cm_futures_client.new_order(symbol='LTCUSDT',
                                                       side=message["side"].upper(),
                                                       type='MARKET',
                                                       quantitiy=message["amount"]
