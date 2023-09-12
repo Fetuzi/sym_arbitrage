@@ -32,7 +32,8 @@ try:
                     res = cm_futures_client.new_order(symbol=message["symbol"],
                                                       side=message["side"].upper(),
                                                       type='MARKET',
-                                                      quantitiy=message["size"])
+                                                      quantitiy=message["size"],
+                                                      positionSide="BOTH")
                     logger.info(f"Order created: {res=}")
                 elif message.get('type') == 'limit':
                     res = cm_futures_client.new_order(symbol=message["symbol"],
@@ -40,7 +41,8 @@ try:
                                                       type="LIMIT",
                                                       quantity=message["size"],
                                                       timeInForce="GTC",
-                                                      price=message["price"])
+                                                      price=message["price"],
+                                                      positionSide="BOTH")
                     logger.info(f"Order created: {res=}")
                 else:
                     logger.error(f"Unexpected market type: {message.get('type')}")
