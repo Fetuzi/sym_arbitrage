@@ -87,10 +87,12 @@ class SymmetricArbitrage:
         pair.sort(key=lambda data: data['t'])
         max_t = pair[1]['t']
         min_ex = pair[0]['ex']
-        max_ex = pair[1]['ex']
-        self.queue[max_ex].popleft()
+        # max_ex = pair[1]['ex']
+        # self.queue[max_ex].popleft()
+        logger.debug(f'Initial {pair=}')
         while self.queue[min_ex] and self.queue[min_ex][0]['t'] < max_t:
             pair[0] = self.queue[min_ex].popleft()
+            logger.debug(f'pop {pair[0]}')
         bid = {pair[0]['ex']: float(pair[0]['b']), pair[1]['ex']: float(pair[1]['b'])}
         ask = {pair[0]['ex']: float(pair[0]['a']), pair[1]['ex']: float(pair[1]['a'])}
         return pair, ask, bid
