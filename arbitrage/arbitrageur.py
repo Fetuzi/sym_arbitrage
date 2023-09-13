@@ -68,6 +68,7 @@ class SymmetricArbitrage:
                 self._update(data)
                 if self.queue[BINANCE] and self.queue[OKX]:
                     pair, ask, bid = self._pair()
+                    logger.debug(f"Selected {pair=}")
                     self._arb(pair, ask, bid)
                     self._liq(ask, bid)
         except Exception as e:
