@@ -10,7 +10,7 @@ from general.logger import setup_logger
 from config.binancefuture_okx_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, REDIS_HOST, REDIS_PORT, REDIS_PUBSUB, REST_MANAGER, BINANCE, OKX, TIME_IN_EXCHANGE, TIME_IN_ARB, FEE_RATE
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]
-logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{RECORDING_COIN}.log"), logging.DEBUG)
+logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{NAME}_{RECORDING_COIN}_{TIMESTAMP}.log"), logging.INFO)
 logger.info(f"init {NAME}")
 
 
@@ -113,7 +113,8 @@ class SymmetricArbitrage:
             self._execute_order('sell', dry_run)
 
     def _liq(self, ask, bid):
-        liq_gap = (FEE_RATE[self.other_ex] * bid[self.other_ex] + FEE_RATE[self.ex] * ask[self.ex])
+        # liq_gap = (FEE_RATE[self.other_ex] * bid[self.other_ex] + FEE_RATE[self.ex] * ask[self.ex])
+        liq_gap = 0
         logger.debug(f"Determine by liq, {self.contract=}, {liq_gap=}")
 
         if self.contract > 0 and bid[self.ex] - ask[self.other_ex] <= liq_gap:

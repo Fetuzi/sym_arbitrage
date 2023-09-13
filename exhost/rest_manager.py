@@ -9,7 +9,7 @@ from general.queue import RedisQueueHandler
 
 app = FastAPI()
 NAME = os.path.splitext(os.path.basename(__file__))[0]
-logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}.log"))
+logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{NAME}_{TIMESTAMP}.log"))
 logger.info(f"init {NAME}")
 
 # Initialize Redis connection

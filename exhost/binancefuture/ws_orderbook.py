@@ -7,7 +7,7 @@ from general.logger import setup_logger
 from config.binancefuture_okx_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, RELAY_PORT
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]
-logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}_{RECORDING_COIN}.log"))
+logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{NAME}_{RECORDING_COIN}_{TIMESTAMP}.log"))
 logger.info(f"init {NAME}")
 
 source_uri = f'wss://fstream.binance.com/ws/{RECORDING_COIN.lower()}usdt@depth5@100ms'

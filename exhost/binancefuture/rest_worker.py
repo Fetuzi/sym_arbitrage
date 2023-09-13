@@ -4,14 +4,15 @@ from binance.um_futures import UMFutures
 from binance.error import ClientError
 from general.logger import setup_logger
 from general.queue import RedisQueueHandler
-from config.binancefuture_okx_arb import (LOG_DIR, TIMESTAMP, BINANCE_API_KEY, BINANCE_SECRET_KEY,
+from config.binancefuture_okx_arb import (LOG_DIR, TIMESTAMP, BINANCE,
+                                          BINANCE_API_KEY, BINANCE_SECRET_KEY,
                                           REDIS_HOST, REDIS_PORT, REDIS_QUEUE)
 
 
 um_futures_client = UMFutures(key=BINANCE_API_KEY, secret=BINANCE_SECRET_KEY)
 
 NAME = os.path.splitext(os.path.basename(__file__))[0]
-logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{TIMESTAMP}_{NAME}.log"))
+logger = setup_logger(NAME, os.path.join(LOG_DIR, f"{NAME}_{BINANCE}_{TIMESTAMP}.log"))
 logger.info(f"init {NAME}")
 
 queue_handler = RedisQueueHandler(REDIS_HOST, REDIS_PORT, REDIS_QUEUE)
