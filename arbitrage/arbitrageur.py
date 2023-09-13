@@ -28,10 +28,6 @@ class SymmetricArbitrage:
         self.contract = 0  # contract
         self.queue = {self.ex: deque(), self.other_ex: deque()}
 
-        # self.ask = {self.ex: 0.0, self.other_ex: 0.0}
-        # self.bid = {self.ex: 0.0, self.other_ex: 0.0}
-        # self.exchange_time = {BINANCE: 0, OKX: 0}
-
         # Redis
         self.redis_conn = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
         self.redis_channel = REDIS_PUBSUB
@@ -91,6 +87,8 @@ class SymmetricArbitrage:
         pair.sort(key=lambda data: data['t'])
         max_t = pair[1]['t']
         min_ex = pair[0]['ex']
+        max_ex = pair[1]['ex']
+        self.queue[max_ex].popleft()
         while self.queue[min_ex] and self.queue[min_ex][0]['t'] < max_t:
             pair[0] = self.queue[min_ex].popleft()
         bid = {pair[0]['ex']: float(pair[0]['b']), pair[1]['ex']: float(pair[1]['b'])}
