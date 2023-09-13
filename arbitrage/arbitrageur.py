@@ -103,6 +103,8 @@ class SymmetricArbitrage:
         time_gap = time_gap and pair[1]['t'] - pair[0]['t'] < TIME_IN_EXCHANGE
         dry_run = not self._risk()  # If pass risk check, not use dry_run
 
+        logger.debug(f'{time_gap=}, {dry_run=}, {buy_gap=}, {sell_gap=}')
+
         if time_gap and bid[self.other_ex] - ask[self.ex] > buy_gap:
             logger.info(f'arbitrage: {self.other_ex}.bid - {self.ex}.ask > {buy_gap}')
             self._execute_order('buy', dry_run)
