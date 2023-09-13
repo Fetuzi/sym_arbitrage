@@ -1,5 +1,5 @@
 import os
-from typing import Union
+from typing import Union, Optional
 import time
 import uuid
 from fastapi import FastAPI
@@ -37,7 +37,7 @@ async def create_order(
         type: str,
         side: str,
         amount: float,
-        price: float,
+        price: Optional[float] = None,
         dry_run: bool = False
 ):
     logger.info(f'Send request: {symbol=}, {type=}, {side=}, {amount=}, {price=}, {dry_run=}')

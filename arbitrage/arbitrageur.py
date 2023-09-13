@@ -87,8 +87,6 @@ class SymmetricArbitrage:
         pair.sort(key=lambda data: data['t'])
         max_t = pair[1]['t']
         min_ex = pair[0]['ex']
-        # max_ex = pair[1]['ex']
-        # self.queue[max_ex].popleft()
         logger.debug(f'Initial {pair=}')
         while self.queue[min_ex] and self.queue[min_ex][0]['t'] < max_t:
             pair[0] = self.queue[min_ex].popleft()
