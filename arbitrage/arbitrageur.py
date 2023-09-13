@@ -93,8 +93,8 @@ class SymmetricArbitrage:
         min_ex = pair[0]['ex']
         while self.queue[min_ex] and self.queue[min_ex][0]['t'] < max_t:
             pair[0] = self.queue[min_ex].popleft()
-        bid = {pair[0]['ex']: pair[0]['b'], pair[1]['ex']: pair[1]['b']}
-        ask = {pair[0]['ex']: pair[0]['a'], pair[1]['ex']: pair[1]['a']}
+        bid = {pair[0]['ex']: float(pair[0]['b']), pair[1]['ex']: float(pair[1]['b'])}
+        ask = {pair[0]['ex']: float(pair[0]['a']), pair[1]['ex']: float(pair[1]['a'])}
         return pair, ask, bid
 
     def _arb(self, pair, ask, bid):
