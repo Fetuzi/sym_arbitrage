@@ -68,7 +68,7 @@ class SymmetricArbitrage:
                 self._update(data)
                 if self.queue[BINANCE] and self.queue[OKX]:
                     pair, ask, bid = self._pair()
-                    logger.debug(f"Selected {pair=}")
+                    logger.debug(f"Selected {pair=}, {ask=} and {bid=}")
                     self._arb(pair, ask, bid)
                     self._liq(ask, bid)
         except Exception as e:
@@ -114,8 +114,8 @@ class SymmetricArbitrage:
 
     def _liq(self, ask, bid):
 
-        liq_gap = FEE_RATE[self.other_ex] * bid[self.other_ex] + FEE_RATE[self.ex] * ask[self.ex]
-        logger.debug(f"Determine by liq, {self.contract=}, {liq_gap=}")
+        # liq_gap = FEE_RATE[self.other_ex] * bid[self.other_ex] + FEE_RATE[self.ex] * ask[self.ex]
+        logger.debug(f"Determine by liq, {self.contract=}")
         # if self.contract > 0 and self.bid[self.ex] - self.ask[self.other_ex] <= liq_gap:
         if self.contract > 0 and bid[self.ex] >= ask[self.other_ex]:
             logger.info(f'liquidate: {self.ex}.bid >= {self.other_ex}.ask')
