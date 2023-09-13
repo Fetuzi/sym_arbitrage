@@ -116,16 +116,16 @@ class SymmetricArbitrage:
 
     def _liq(self, ask, bid):
         # liq_gap = (FEE_RATE[self.other_ex] * bid[self.other_ex] + FEE_RATE[self.ex] * ask[self.ex])
-        liq_gap = 0
+        liq_gap = 0.01
         logger.debug(f"Determine by liq, {self.contract=}, {liq_gap=}")
 
         # if self.contract > 0 and ask[self.other_ex] - bid[self.ex] <= liq_gap:
-        if self.contract > 0 and bid[self.ex] >= ask[self.other_ex]:
+        if self.contract > 0 and bid[self.ex] >= ask[self.other_ex] or abs(ask[self.other_ex] - bid[self.ex]) < liq_gap:
             logger.info(f'liquidate: {self.ex}.bid >= {self.other_ex}.ask')
             logger.info(f'liquidate: {bid[self.ex]} >= {ask[self.other_ex]}')
             self._execute_order('sell', False)  # Price is arbitrary
         # if self.contract < 0 and bid[self.other_ex] - ask[self.ex] <= liq_gap:
-        if self.contract < 0 and ask[self.ex] <= bid[self.other_ex]:
+        if self.contract < 0 and ask[self.ex] <= bid[self.other_ex] or abs(ask[self.ex] - bid[self.other_ex]) < liq_gap:
             logger.info(f'liquidate: {self.ex}.ask <= {self.other_ex}.bid')
             logger.info(f'liquidate: {ask[self.ex]} <= {bid[self.other_ex]}')
             self._execute_order('buy', False)
