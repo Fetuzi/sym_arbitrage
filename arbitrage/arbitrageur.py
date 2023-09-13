@@ -4,8 +4,8 @@ import time
 import traceback
 import json
 import redis
+from collections import deque
 import requests
-
 from general.logger import setup_logger
 from config.binancefuture_okx_arb import TIMESTAMP, LOG_DIR, RECORDING_COIN, REDIS_HOST, REDIS_PORT, REDIS_PUBSUB, REST_MANAGER, BINANCE, OKX, TIME_IN_EXCHANGE, TIME_IN_ARB, FEE_RATE
 
@@ -26,9 +26,11 @@ class SymmetricArbitrage:
         # status
         self.time = int(time.time() * 1000)
         self.contract = 0  # contract
-        self.ask = {BINANCE: 0.0, OKX: 0.0}
-        self.bid = {BINANCE: 0.0, OKX: 0.0}
-        self.exchange_time = {BINANCE: 0, OKX: 0}
+        self.queue = {self.ex: deque(), self.other_ex: deque()}
+
+        # self.ask = {self.ex: 0.0, self.other_ex: 0.0}
+        # self.bid = {self.ex: 0.0, self.other_ex: 0.0}
+        # self.exchange_time = {BINANCE: 0, OKX: 0}
 
         # Redis
         self.redis_conn = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
@@ -40,7 +42,7 @@ class SymmetricArbitrage:
             "type": "market",
             "side": side,
             "amount": 1.0,
-            "price": (self.ask[self.ex] + self.bid[self.ex]) / 2,  # Pseudo Price for market order
+            "price": None,
             "dry_run": dry_run
         }
         logger.info(f"request {params=}")
@@ -64,9 +66,10 @@ class SymmetricArbitrage:
                 data = json.loads(message['data'].decode('utf-8'))
                 logger.debug(f'{data=}')
                 self._update(data)
-                self._arb()
-                self._liq()
-
+                if self.queue[BINANCE] and self.queue[OKX]:
+                    pair, ask, bid = self._pair()
+                    self._arb(pair, ask, bid)
+                    self._liq(ask, bid)
         except Exception as e:
             logger.info(f'Error occurred: {traceback.format_exc()}')
         finally:
@@ -80,34 +83,47 @@ class SymmetricArbitrage:
 
     def _update(self, data):
         self.time = int(time.time() * 1000)
+        self.queue[data['ex']].append(data)
 
-        self.ask[data['ex']] = float(data['a'])
-        self.bid[data['ex']] = float(data['b'])
-        self.exchange_time[data['ex']] = data['t']
+    def _pair(self):
+        pair = [self.queue[BINANCE][0], self.queue[OKX][0]]
+        pair.sort(key=lambda data: data['t'])
+        max_t = pair[1]['t']
+        min_ex = pair[0]['ex']
+        while self.queue[min_ex] and self.queue[min_ex][0]['t'] < max_t:
+            pair[0] = self.queue[min_ex].popleft()
+        bid = {pair[0]['ex']: pair[0]['b'], pair[1]['ex']: pair[1]['b']}
+        ask = {pair[0]['ex']: pair[0]['a'], pair[1]['ex']: pair[1]['a']}
+        return pair, ask, bid
 
-    def _arb(self):
-        time_gap = self.time - min(self.exchange_time[BINANCE], self.exchange_time[OKX]) < TIME_IN_ARB
-        time_gap = time_gap and abs(self.exchange_time[BINANCE] - self.exchange_time[OKX]) < TIME_IN_EXCHANGE
+    def _arb(self, pair, ask, bid):
+        buy_gap = 2 * (FEE_RATE[self.other_ex] * bid[self.other_ex] + FEE_RATE[self.ex] * ask[self.ex])
+        sell_gap = 2 * (FEE_RATE[self.ex] * bid[self.ex] + FEE_RATE[self.other_ex] * ask[self.other_ex])
+
+        time_gap = self.time - pair[0]['t'] < TIME_IN_ARB
+        time_gap = time_gap and pair[1]['t'] - pair[0]['t'] < TIME_IN_EXCHANGE
         dry_run = not self._risk()  # If pass risk check, not use dry_run
-        buy_gap = 2 * (FEE_RATE[self.other_ex] * self.bid[self.other_ex] + FEE_RATE[self.ex] * self.ask[self.ex])
-        sell_gap = 2 * (FEE_RATE[self.ex] * self.bid[self.ex] + FEE_RATE[self.other_ex] * self.ask[self.other_ex])
-        logger.debug(f'{time_gap=}, {dry_run=}, {buy_gap=}, {sell_gap=}')
-        if time_gap and self.bid[self.other_ex] - self.ask[self.ex] > buy_gap:
+
+        if time_gap and bid[self.other_ex] - ask[self.ex] > buy_gap:
             logger.info(f'arbitrage: {self.other_ex}.bid - {self.ex}.ask > {buy_gap}')
             self._execute_order('buy', dry_run)
-        if time_gap and self.bid[self.ex] - self.ask[self.other_ex] > sell_gap:
+        if time_gap and bid[self.ex] - ask[self.other_ex] > sell_gap:
             logger.info(f"arbitrage: {self.ex}.bid - {self.other_ex}.ask > {sell_gap}")
             self._execute_order('sell', dry_run)
 
-    def _liq(self):
-        logger.debug(f"Determine by liq, {self.contract=}")
-        if self.contract > 0 and self.bid[self.ex] >= self.ask[self.other_ex]:
+    def _liq(self, ask, bid):
+
+        liq_gap = FEE_RATE[self.other_ex] * bid[self.other_ex] + FEE_RATE[self.ex] * ask[self.ex]
+        logger.debug(f"Determine by liq, {self.contract=}, {liq_gap=}")
+        # if self.contract > 0 and self.bid[self.ex] - self.ask[self.other_ex] <= liq_gap:
+        if self.contract > 0 and bid[self.ex] >= ask[self.other_ex]:
             logger.info(f'liquidate: {self.ex}.bid >= {self.other_ex}.ask')
-            logger.info(f'liquidate: {self.bid[self.ex]} >= {self.ask[self.other_ex]}')
+            logger.info(f'liquidate: {bid[self.ex]} >= {ask[self.other_ex]}')
             self._execute_order('sell', False)  # Price is arbitrary
-        if self.contract < 0 and self.ask[self.ex] <= self.bid[self.other_ex]:
+        # if self.contract < 0 and self.bid[self.other_ex] - self.ask[self.ex] <= liq_gap:
+        if self.contract < 0 and ask[self.ex] <= bid[self.other_ex]:
             logger.info(f'liquidate: {self.ex}.ask <= {self.other_ex}.bid')
-            logger.info(f'liquidate: {self.ask[self.ex]} <= {self.bid[self.other_ex]}')
+            logger.info(f'liquidate: {ask[self.ex]} <= {bid[self.other_ex]}')
             self._execute_order('buy', False)
 
 
