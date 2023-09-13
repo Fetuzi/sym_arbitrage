@@ -114,7 +114,7 @@ class SymmetricArbitrage:
 
     def _liq(self, ask, bid):
         liq_gap = (FEE_RATE[self.other_ex] * bid[self.other_ex] + FEE_RATE[self.ex] * ask[self.ex])
-        logger.debug(f"Determine by liq, {self.contract=}")
+        logger.debug(f"Determine by liq, {self.contract=}, {liq_gap=}")
 
         if self.contract > 0 and bid[self.ex] - ask[self.other_ex] <= liq_gap:
         # if self.contract > 0 and bid[self.ex] >= ask[self.other_ex]:
