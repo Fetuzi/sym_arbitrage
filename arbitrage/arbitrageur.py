@@ -88,7 +88,7 @@ class SymmetricArbitrage:
         max_t = pair[1]['t']
         min_ex = pair[0]['ex']
         logger.debug(f'Initial {pair=}')
-        while self.queue[min_ex] and self.queue[min_ex][0]['t'] < max_t:
+        while self.queue[min_ex] and self.queue[min_ex][0]['t'] <= max_t:
             pair[0] = self.queue[min_ex].popleft()
             logger.debug(f'pop {pair[0]}')
         bid = {pair[0]['ex']: float(pair[0]['b']), pair[1]['ex']: float(pair[1]['b'])}
